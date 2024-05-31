@@ -1,4 +1,5 @@
 using Scripts.Infrastructure;
+using Scripts.ServerClientCommunication;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +19,12 @@ namespace Scripts.Screens
 
         private void StartPollClickedCallback()
         {
+            FakeServerLink.Instance.RequestToEnterPoll(new EnterPollRequest(), EnterPollResponseHandler);
+        }
+
+        private void EnterPollResponseHandler(BaseServerResponse reponse)
+        {
+            var enterPollReponse = reponse as EnterPollResponse;
             ScenesManager.Instance.LoadScene(SceneName.Poll);
         }
     }

@@ -12,6 +12,8 @@ namespace Scripts.Screens
         [SerializeField] private PollOptionPosition[] _pollOptionPositions;
         [SerializeField] private RectTransform _pollOptionsContainer;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
+        private int? _lastSelectedId;
+        private Dictionary<int, PollOptionUi> _pollOptionUiById;
 
         private void Awake()
         {
@@ -45,6 +47,7 @@ namespace Scripts.Screens
 
         public void DisplayPoll()
         {
+            _pollOptionUiById = new();
             var optionsCount = 4;
             for (var i = 0; i < _optionPositionsByOptionsCount[optionsCount].Count; i++) 
             {
@@ -56,7 +59,23 @@ namespace Scripts.Screens
                     Id = i,
                     Title = "TEXT"
                 });
+                newOptionUi.OnClicked += OptionClickedCallback;
+                _pollOptionUiById.Add(i, newOptionUi);
             }
+        }
+
+        private void OptionClickedCallback(int id)
+        {
+            if (_lastSelectedId != null)
+            {
+                if (_lastSelectedId.Value == id)
+                {
+                    return;
+                }
+                _pollOptionUiById[_lastSelectedId.Value].SetIsSelected(false);
+            }
+            _lastSelectedId = id;
+            _pollOptionUiById[_lastSelectedId.Value].SetIsSelected(true);
         }
     }
 }
