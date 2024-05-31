@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scripts.Screens.Main
+namespace Scripts.Screens
 {
     public class MainScreenManager : MonoBehaviour
     {
