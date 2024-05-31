@@ -1,16 +1,28 @@
-using Scripts.UiElements;
+using ServerClientCommunication;
+using UiElements;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using Infrastructure;
 
-namespace Scripts.Screens
+namespace Screens
 {
     public class PollScreenManager : MonoBehaviour
     {
+        private enum PollPhase
+        {
+            Spectate,
+            WaitingForAnswer,
+            WaitingForResults,
+            Results
+        }
+
         [SerializeField] private PollOptionUi _pollOptionUiPrefab;
         [SerializeField] private PollOptionPosition[] _pollOptionPositions;
         [SerializeField] private RectTransform _pollOptionsContainer;
+        [SerializeField] private TextMeshProUGUI _pollQuestionText;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
         private int? _lastSelectedId;
         private Dictionary<int, PollOptionUi> _pollOptionUiById;
@@ -45,19 +57,28 @@ namespace Scripts.Screens
             throw new Exception($"Unhandled {nameof(PollOptionPositionCategory)} {category}!");
         }
 
+        private EnterPollResponseData PollServerData => ClientServices.Instance.PollStore.CurrentPollServerData;
+
         public void DisplayPoll()
         {
+            _pollQuestionText.text = PollServerData.Question;
+
             _pollOptionUiById = new();
-            var optionsCount = 4;
+            var optionsCount = PollServerData.OptionsData.Count;
             for (var i = 0; i < _optionPositionsByOptionsCount[optionsCount].Count; i++) 
             {
                 var optionPosition = _optionPositionsByOptionsCount[optionsCount][i];
                 var newOptionUi = Instantiate(_pollOptionUiPrefab, _pollOptionsContainer);
+                var optionData = PollServerData.OptionsData[i];
                 newOptionUi.RectTransform.position = optionPosition.transform.position;
+                // Loading images from the Resources folder is supposed to simulate loading
+                // images from the web.
+                var imageSprite = Resources.Load<Sprite>(optionData.ImageUrl);
                 newOptionUi.Initialize(new PollOptionUiInitializeData()
                 {
                     Id = i,
-                    Title = "TEXT"
+                    Title = optionData.Title,
+                    MainImageSprite = imageSprite
                 });
                 newOptionUi.OnClicked += OptionClickedCallback;
                 _pollOptionUiById.Add(i, newOptionUi);

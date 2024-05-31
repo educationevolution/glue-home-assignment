@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Scripts.ServerClientCommunication
+namespace ServerClientCommunication
 {
     public abstract class BaseServerResponse
     {

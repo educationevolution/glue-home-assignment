@@ -1,12 +1,12 @@
-using Scripts.Infrastructure;
-using Scripts.ServerClientCommunication;
+using Infrastructure;
+using ServerClientCommunication;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scripts.Screens
+namespace Screens
 {
     public class MainScreenManager : MonoBehaviour
     {
@@ -25,6 +25,7 @@ namespace Scripts.Screens
         private void EnterPollResponseHandler(BaseServerResponse reponse)
         {
             var enterPollReponse = reponse as EnterPollResponse;
+            ClientServices.Instance.PollStore.SetCurrentPollServerData(enterPollReponse.Data);
             ScenesManager.Instance.LoadScene(SceneName.Poll);
         }
     }

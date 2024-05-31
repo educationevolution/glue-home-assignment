@@ -1,11 +1,11 @@
-using Scripts.Infrastructure;
+using Infrastructure;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace Scripts.ServerClientCommunication
+namespace ServerClientCommunication
 {
     public class FakeServerLink : MonoBehaviour
     {

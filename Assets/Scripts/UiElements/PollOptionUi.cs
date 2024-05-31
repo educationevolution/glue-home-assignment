@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scripts.UiElements
+namespace UiElements
 {
     public struct PollOptionUiInitializeData
     {
@@ -65,7 +65,6 @@ namespace Scripts.UiElements
         private void ButtonClickedCallback()
         {
             OnClicked?.Invoke(_optionId);
-            Debug.LogError(">>>>>>>CLICKED");
         }
     }
 }

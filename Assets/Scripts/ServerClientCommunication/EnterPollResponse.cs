@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Scripts.ServerClientCommunication
+namespace ServerClientCommunication
 {
     public class PollOptionData
     {
@@ -26,23 +26,23 @@ namespace Scripts.ServerClientCommunication
             Data = new EnterPollResponseData()
             {
                 Id = Random.Range(0, 9999),
-                Question = "Who is the best singer?",
+                Question = "WHO IS THE<BR>BEST SINGER?",
                 OptionsData = new List<PollOptionData>()
                 {
                     new PollOptionData()
                     {
-                        Title = "BEYONCE",
-                        ImageUrl = "",
+                        Title = "Beyonce",
+                        ImageUrl = "Images/Beyoncé",
                     },
                     new PollOptionData()
                     {
-                        Title = "ARIANA",
-                        ImageUrl = "",
+                        Title = "Ariana",
+                        ImageUrl = "Images/Ariana",
                     },
                     new PollOptionData()
                     {
-                        Title = "TAYLOR",
-                        ImageUrl = "",
+                        Title = "Taylor",
+                        ImageUrl = "Images/Taylor",
                     }
                 }
             };
