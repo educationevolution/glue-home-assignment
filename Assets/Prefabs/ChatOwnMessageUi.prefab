@@ -35,11 +35,11 @@ RectTransform:
   m_Father: {fileID: 8525570472354687886}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 10, y: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -10, y: 0}
   m_SizeDelta: {x: 80, y: -20}
-  m_Pivot: {x: 0, y: 0.5}
+  m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &8444273303445476872
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 2089386107886982079}
   - component: {fileID: 5625058459303174160}
   m_Layer: 5
-  m_Name: ChatMessageUi
+  m_Name: ChatOwnMessageUi
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -188,8 +188,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 49.399998, y: 0}
-  m_SizeDelta: {x: -98.8, y: 0}
+  m_AnchoredPosition: {x: -47.5, y: 0}
+  m_SizeDelta: {x: -103, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4929872632292378581
 CanvasRenderer:
@@ -228,8 +228,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4294958728
+  m_fontColor: {r: 0.53207546, g: 0.8710245, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -253,7 +253,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0

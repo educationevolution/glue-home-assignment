@@ -26,6 +26,7 @@ namespace Screens
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
         private int? _lastSelectedId;
         private Dictionary<int, PollOptionUi> _pollOptionUiById;
+        private TouchScreenKeyboard keyboard;
 
         private void Awake()
         {
@@ -44,14 +45,28 @@ namespace Screens
 
         private void Start()
         {
-            DisplayPoll();
-
-            var request = new SendChatMessageRequest(new SendChatMessageRequestData()
+#if UNITY_EDITOR
+            if (PollServerData == null)
             {
-                Message = "TEST!!!",
-            });
-            FakeServerLink.Instance.SendRequestToServer(request, null);
+                // Required only when running this scene directly
+                FakeServerLink.Instance.SendRequestToServer(new EnterPollRequest(), null);
+                StartCoroutine(DisplayPollWhenReady());
+                return;
+            }
+#endif
+            DisplayPoll();
         }
+
+#if UNITY_EDITOR
+        private IEnumerator DisplayPollWhenReady()
+        {
+            while (PollServerData == null)
+            {
+                yield return null;
+            }
+            DisplayPoll();
+        }
+#endif
 
         private int GetOptionCountByCategory(PollOptionPositionCategory category) 
         {

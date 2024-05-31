@@ -24,8 +24,6 @@ namespace Screens
 
         private void EnterPollResponseHandler(BaseServerResponse reponse)
         {
-            var enterPollReponse = reponse as EnterPollResponse;
-            ClientServices.Instance.PollStore.SetCurrentPollServerData(enterPollReponse.Data);
             ScenesManager.Instance.LoadScene(SceneName.Poll);
         }
     }

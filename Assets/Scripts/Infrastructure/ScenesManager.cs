@@ -29,7 +29,6 @@ namespace Infrastructure
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = _defaultTargetFrameRate;
             Instance = this;
-            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
             var currentSceneName = SceneManager.GetActiveScene().name;
             Enum.TryParse(currentSceneName, out SceneName sceneName);

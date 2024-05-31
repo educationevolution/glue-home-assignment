@@ -1,3 +1,4 @@
+using Infrastructure;
 using ServerClientCommunication;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +10,8 @@ namespace Chat
 {
     public class ChatMessagesDisplayer : MonoBehaviour
     {
-        [SerializeField] private ChatMessageUi _messageUiPrefab;
+        [SerializeField] private ChatMessageUi _defaultMessageUiPrefab;
+        [SerializeField] private ChatMessageUi _ownMessageUiPrefab;
         [SerializeField] private int _maxDisplayedMessages = 10;
         [SerializeField] private RectTransform _messagesContainer;
         private List<ChatMessageUi> _messages = new();
@@ -36,17 +38,15 @@ namespace Chat
 
         private void HandleChatMessageDataReceived(ServerChatMessageData messageData)
         {
-            ChatMessageUi newMessageUi;
             if (_messages.Count >= _maxDisplayedMessages)
             {
-                newMessageUi = _messages[0];
-                newMessageUi.transform.SetParent(null);
+                var messageUiToRemove = _messages[0];
                 _messages.RemoveAt(0);
-                newMessageUi.transform.SetParent(_messagesContainer);
-            } else
-            {
-                newMessageUi = Instantiate(_messageUiPrefab, _messagesContainer);
+                ObjectPool.Instance.RevertObjectToPool(messageUiToRemove);
             }
+            var prefab = messageData.UserId == ClientServices.Instance.FakeUserId ?
+                _ownMessageUiPrefab : _defaultMessageUiPrefab;
+            var newMessageUi = ObjectPool.Instance.GetObjectFromPool(prefab, _messagesContainer).GetComponent<ChatMessageUi>();
             newMessageUi.Initialize(messageData.Text, messageData.AvatarImageUrl);
             _messages.Add(newMessageUi);
         }

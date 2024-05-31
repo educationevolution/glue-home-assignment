@@ -50,7 +50,10 @@ namespace ServerClientCommunication
 
         public void SendRequestToServer(BaseServerRequest request, Action<BaseServerResponse> responseHandler)
         {
-            GenericCanvas.Instance.ShowGenericLoadingMessage();
+            if (responseHandler != null)
+            {
+                GenericCanvas.Instance.ShowGenericLoadingMessage();
+            }
             request.SetRequestMetadata(ClientServices.Instance.FakeUserId);
             var requestId = _nextRequestId;
             _nextRequestId += 1;
@@ -60,8 +63,13 @@ namespace ServerClientCommunication
 
         private IEnumerator FakeRequestCoroutine(int id, BaseServerRequest request, Action<BaseServerResponse> responseHandler)
         {
-            yield return new WaitForSeconds(0.4f);
-            var reponse = new EnterPollResponse(isSuccess: true);
+            var fakeServerResponseDelay = 0.2f;
+            yield return new WaitForSeconds(fakeServerResponseDelay);
+
+            BaseServerResponse reponse = new EnterPollResponse(isSuccess: true);
+
+            _fakeRequestsById.Remove(id);
+
             if (request is SendChatMessageRequest)
             {
                 var chatMessageRequest = request as SendChatMessageRequest;
@@ -73,9 +81,14 @@ namespace ServerClientCommunication
                     AvatarImageUrl = ClientServices.Instance.FakeUserAvatarImageUrl
                 });
             }
-            _fakeRequestsById.Remove(id);
+            else if (request is EnterPollRequest)
+            {
+                var enterPollReponse = new EnterPollResponse(isSuccess: true);
+                ClientServices.Instance.PollStore.SetCurrentPollServerData(enterPollReponse.Data);
+                responseHandler?.Invoke(reponse);
+            }
+
             GenericCanvas.Instance.HideGenericLoadingMessage();
-            responseHandler?.Invoke(reponse);
         }
 
         private IEnumerator FakeChatMessagesCoroutine()

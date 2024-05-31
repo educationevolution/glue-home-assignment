@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace UiElements
 {
-    public class ChatMessageUi : MonoBehaviour
+    public class ChatMessageUi : PooledObject
     {
         [SerializeField] private TextMeshProUGUI _messageText;
         [SerializeField] private Image _avatarImage;
@@ -16,6 +16,16 @@ namespace UiElements
         {
             _avatarImage.sprite = ClientServices.Instance.ImageStore.LoadImage(avatarImageUrl);
             _messageText.text = text;
+        }
+
+        public override void PrepareForUsage()
+        {
+            
+        }
+
+        public override void PreRevertToPool()
+        {
+            
         }
     }
 }
