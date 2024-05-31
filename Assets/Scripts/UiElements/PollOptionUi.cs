@@ -1,3 +1,4 @@
+using Infrastructure;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace UiElements
     {
         public int Id;
         public string Title;
-        public Sprite MainImageSprite;
+        public string ImageUrl;
     }
 
     public class PollOptionUi : MonoBehaviour
@@ -30,13 +31,12 @@ namespace UiElements
         private void Awake()
         {
             _button.onClick.AddListener(ButtonClickedCallback);
-            //Initialize(1, "Swift");
         }
 
         public void Initialize(PollOptionUiInitializeData initData)
         {
             _optionId = initData.Id;
-            _mainImage.sprite = initData.MainImageSprite;
+            _mainImage.sprite = ClientServices.Instance.ImageStore.LoadImage(initData.ImageUrl);
             var sparksRotation = _sparksContainer.eulerAngles;
             sparksRotation.z = UnityEngine.Random.Range(0, 360);
             _sparksContainer.eulerAngles = sparksRotation;

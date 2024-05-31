@@ -9,6 +9,9 @@ namespace Infrastructure
     {
         public static ClientServices Instance { get; private set; }
         public PollStore PollStore { get; private set; }
+        public ImageStore ImageStore { get; private set; }
+        public int FakeUserId => 1;
+        public string FakeUserAvatarImageUrl => $"Images/mainUserAvatar";
 
         private void Awake()
         {
@@ -20,6 +23,7 @@ namespace Infrastructure
             Instance = this;
             DontDestroyOnLoad(gameObject);
             PollStore = new();
+            ImageStore = new();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Screens
 
         private void StartPollClickedCallback()
         {
-            FakeServerLink.Instance.RequestToEnterPoll(new EnterPollRequest(), EnterPollResponseHandler);
+            FakeServerLink.Instance.SendRequestToServer(new EnterPollRequest(), EnterPollResponseHandler);
         }
 
         private void EnterPollResponseHandler(BaseServerResponse reponse)

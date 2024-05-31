@@ -40,7 +40,17 @@ namespace Screens
                 }
                 _optionPositionsByOptionsCount[optionsCount].Add(optionPosition);
             }
+        }
+
+        private void Start()
+        {
             DisplayPoll();
+
+            var request = new SendChatMessageRequest(new SendChatMessageRequestData()
+            {
+                Message = "TEST!!!",
+            });
+            FakeServerLink.Instance.SendRequestToServer(request, null);
         }
 
         private int GetOptionCountByCategory(PollOptionPositionCategory category) 
@@ -71,14 +81,11 @@ namespace Screens
                 var newOptionUi = Instantiate(_pollOptionUiPrefab, _pollOptionsContainer);
                 var optionData = PollServerData.OptionsData[i];
                 newOptionUi.RectTransform.position = optionPosition.transform.position;
-                // Loading images from the Resources folder is supposed to simulate loading
-                // images from the web.
-                var imageSprite = Resources.Load<Sprite>(optionData.ImageUrl);
                 newOptionUi.Initialize(new PollOptionUiInitializeData()
                 {
                     Id = i,
                     Title = optionData.Title,
-                    MainImageSprite = imageSprite
+                    ImageUrl = optionData.ImageUrl
                 });
                 newOptionUi.OnClicked += OptionClickedCallback;
                 _pollOptionUiById.Add(i, newOptionUi);
