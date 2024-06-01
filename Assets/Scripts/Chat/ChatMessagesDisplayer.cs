@@ -42,11 +42,11 @@ namespace Chat
             {
                 var messageUiToRemove = _messages[0];
                 _messages.RemoveAt(0);
-                ObjectPool.Instance.RevertObjectToPool(messageUiToRemove);
+                ObjectPool.Instance.Revert(messageUiToRemove);
             }
             var prefab = messageData.UserId == ClientServices.Instance.FakeUserId ?
                 _ownMessageUiPrefab : _defaultMessageUiPrefab;
-            var newMessageUi = ObjectPool.Instance.GetObjectFromPool(prefab, _messagesContainer).GetComponent<ChatMessageUi>();
+            var newMessageUi = ObjectPool.Instance.Borrow(prefab, _messagesContainer).GetComponent<ChatMessageUi>();
             newMessageUi.Initialize(messageData.Text, messageData.AvatarImageUrl);
             _messages.Add(newMessageUi);
         }

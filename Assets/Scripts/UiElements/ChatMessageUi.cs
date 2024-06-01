@@ -18,12 +18,12 @@ namespace UiElements
             _messageText.text = text;
         }
 
-        public override void PrepareForUsage()
+        public override void HandlePostBorrowFromPool()
         {
             
         }
 
-        public override void PreRevertToPool()
+        public override void HandlePreRevertToPool()
         {
             
         }

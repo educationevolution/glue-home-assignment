@@ -6,8 +6,8 @@ namespace Infrastructure
 {
     public abstract class PooledObject : MonoBehaviour
     {
-        public abstract void PrepareForUsage();
-        public abstract void PreRevertToPool();
+        public abstract void HandlePostBorrowFromPool();
+        public abstract void HandlePreRevertToPool();
     }
 
     public class ObjectPool : MonoBehaviour
@@ -28,7 +28,7 @@ namespace Infrastructure
             DontDestroyOnLoad(gameObject);
         }
 
-        public PooledObject GetObjectFromPool(PooledObject prefab, Transform parent)
+        public PooledObject Borrow(PooledObject prefab, Transform parent)
         {
             var prefabInstanceId = prefab.GetInstanceID();
             if (_inactivePool.ContainsKey(prefabInstanceId) == false || _inactivePool[prefabInstanceId].Count == 0)
@@ -40,20 +40,20 @@ namespace Infrastructure
                 }
                 _activePool[prefabInstanceId].Add(newInstance);
                 _prefabInstanceIdByObjectInstanceId[newInstance.GetInstanceID()] = prefabInstanceId;
-                newInstance.PrepareForUsage();
+                newInstance.HandlePostBorrowFromPool();
                 return newInstance;
             }
             var existingInstance = _inactivePool[prefabInstanceId][0];
             _inactivePool[prefabInstanceId].RemoveAt(0);
             existingInstance.transform.SetParent(parent);
-            existingInstance.PrepareForUsage();
+            existingInstance.HandlePostBorrowFromPool();
             return existingInstance;
         }
 
-        public void RevertObjectToPool(PooledObject pooledObject)
+        public void Revert(PooledObject pooledObject)
         {
             var prefabInstanceId = _prefabInstanceIdByObjectInstanceId[pooledObject.GetInstanceID()];
-            pooledObject.PreRevertToPool();
+            pooledObject.HandlePreRevertToPool();
             pooledObject.transform.SetParent(transform);
             _activePool[prefabInstanceId].Remove(pooledObject);
             if (_inactivePool.ContainsKey(prefabInstanceId) == false)

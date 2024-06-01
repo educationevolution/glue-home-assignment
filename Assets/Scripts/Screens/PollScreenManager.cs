@@ -9,24 +9,28 @@ using Infrastructure;
 
 namespace Screens
 {
+    public enum PollPhase
+    {
+        Spectate,
+        WaitingForAnswer,
+        WaitingForResults,
+        Results
+    }
+
     public class PollScreenManager : MonoBehaviour
     {
-        private enum PollPhase
-        {
-            Spectate,
-            WaitingForAnswer,
-            WaitingForResults,
-            Results
-        }
-
         [SerializeField] private PollOptionUi _pollOptionUiPrefab;
         [SerializeField] private PollOptionPosition[] _pollOptionPositions;
         [SerializeField] private RectTransform _pollOptionsContainer;
         [SerializeField] private TextMeshProUGUI _pollQuestionText;
+        [SerializeField] private CountdownTimerUi _countdownTimer;
+        [SerializeField] private PollBottomBar _bottomBar;
+        [SerializeField] private DrawingController _drawingController;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
         private int? _lastSelectedId;
         private Dictionary<int, PollOptionUi> _pollOptionUiById;
-        private TouchScreenKeyboard keyboard;
+        private PollPhase _pollPhase;
+        private bool _isDrawingEnabled;
 
         private void Awake()
         {
@@ -41,10 +45,15 @@ namespace Screens
                 }
                 _optionPositionsByOptionsCount[optionsCount].Add(optionPosition);
             }
+            _bottomBar.OnStartPollButtonClicked += StartPollButtonClickedCallback;
+            _bottomBar.OnDrawingButtonClicked += DrawingButtonClickedCallback;
+            _bottomBar.OnGalleryButtonClicked += GalleryButtonClickedCallback;
+            _bottomBar.OnStickersButtonClicked += StickersButtonClickedCallback;
         }
-
+        
         private void Start()
         {
+            SetPollPhase(PollPhase.Spectate);
 #if UNITY_EDITOR
             if (PollServerData == null)
             {
@@ -84,6 +93,13 @@ namespace Screens
 
         private EnterPollResponseData PollServerData => ClientServices.Instance.PollStore.CurrentPollServerData;
 
+        private void SetPollPhase(PollPhase pollPhase)
+        {
+            _pollPhase = pollPhase;
+            _bottomBar.RefreshUi(_pollPhase);
+            _bottomBar.RefreshDrawingButtonSprite(_isDrawingEnabled);
+        }
+
         public void DisplayPoll()
         {
             _pollQuestionText.text = PollServerData.Question;
@@ -105,6 +121,7 @@ namespace Screens
                 newOptionUi.OnClicked += OptionClickedCallback;
                 _pollOptionUiById.Add(i, newOptionUi);
             }
+            _countdownTimer.StartCountdown(63.3f);
         }
 
         private void OptionClickedCallback(int id)
@@ -119,6 +136,33 @@ namespace Screens
             }
             _lastSelectedId = id;
             _pollOptionUiById[_lastSelectedId.Value].SetIsSelected(true);
+        }
+
+        private void StartPollButtonClickedCallback()
+        {
+            SetPollPhase(PollPhase.WaitingForAnswer);
+        }
+
+        private void DrawingButtonClickedCallback()
+        {
+            SetIsDrawingEnabled(!_isDrawingEnabled);
+        }
+
+        private void SetIsDrawingEnabled(bool isEnabled)
+        {
+            _isDrawingEnabled = isEnabled;
+            _drawingController.SetIsEnabled(_isDrawingEnabled);
+            _bottomBar.RefreshDrawingButtonSprite(_isDrawingEnabled);
+        }
+
+        private void GalleryButtonClickedCallback()
+        {
+            SetIsDrawingEnabled(false);
+        }
+
+        private void StickersButtonClickedCallback()
+        {
+            SetIsDrawingEnabled(false);
         }
     }
 }

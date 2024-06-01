@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Infrastructure
 {
-    public class DrawingLine : MonoBehaviour
+    public class DrawingLine : PooledObject
     {
         [SerializeField] private LineRenderer _lineRenderer;
         [SerializeField] private float _minDistanceBetweenPoints = 0.1f;
@@ -26,6 +26,16 @@ namespace Infrastructure
             }
             _lineRenderer.positionCount += 1;
             _lineRenderer.SetPosition(_lineRenderer.positionCount - 1, worldPosition);
+        }
+
+        public override void HandlePostBorrowFromPool()
+        {
+            
+        }
+
+        public override void HandlePreRevertToPool()
+        {
+            _lineRenderer.positionCount = 0;
         }
     }
 }

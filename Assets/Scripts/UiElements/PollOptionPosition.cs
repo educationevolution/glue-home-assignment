@@ -36,7 +36,7 @@ namespace UiElements
         private void OnDrawGizmos()
         {
             Gizmos.color = GetCategoryColor();
-            Gizmos.DrawSphere(transform.position, 20);
+            Gizmos.DrawSphere(transform.position, 1f);
         }
     }
 }

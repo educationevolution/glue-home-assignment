@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Infrastructure
@@ -9,20 +10,55 @@ namespace Infrastructure
         [SerializeField] private Camera _camera;
         [SerializeField] private DrawingLine _linePrefab;
         [SerializeField] private Transform _linesContainer;
-        private Dictionary<int, DrawingLine> _drawingLinesById = new();
-        private int _currentLineId = 0;
-
+        [SerializeField] private RectTransform _drawingBounds;
+        private List<DrawingLine> _drawingLines = new();
+        private bool _isEnabled = false;
         private bool _isButtonDown = false;
+        private Rect _drawingBoundsRect;
+
+        private void Awake()
+        {
+            var xMin = _drawingBounds.anchorMin.x * Screen.width;
+            var yMin = _drawingBounds.anchorMin.y * Screen.height;
+            _drawingBoundsRect = new()
+            {
+                x = xMin,
+                y = yMin,
+                width = (_drawingBounds.anchorMax.x - _drawingBounds.anchorMin.x) * Screen.width,
+                height = (_drawingBounds.anchorMax.y - _drawingBounds.anchorMin.y) * Screen.height
+            };
+        }
+
+        public void SetIsEnabled(bool isEnabled)
+        {
+            _isEnabled = isEnabled;
+            if (_isEnabled == false)
+            {
+                _isButtonDown = false;
+            }
+        }
+
+        public void Clear()
+        {
+            for (var i = 0; i < _drawingLines.Count; i++) 
+            {
+                ObjectPool.Instance.Revert(_drawingLines[i]);
+            }
+            _drawingLines.Clear();
+        }
 
         private void Update()
         {
+            if (_isEnabled == false)
+            {
+                return;
+            }
             if (Input.GetMouseButtonDown(0))
             {
                 _isButtonDown = true;
-                var newLine = Instantiate(_linePrefab, _linesContainer);
+                var newLine = ObjectPool.Instance.Borrow(_linePrefab, _linesContainer).GetComponent<DrawingLine>();
                 newLine.transform.position = GetMouseWorldPosition;
-                _currentLineId += 1;
-                _drawingLinesById[_currentLineId] = newLine;
+                _drawingLines.Add(newLine);
                 return;
             } 
             if (Input.GetMouseButtonUp(0))
@@ -31,7 +67,7 @@ namespace Infrastructure
             }
             if (_isButtonDown)
             {
-                _drawingLinesById[_currentLineId].AddPointIfPossible(GetMouseWorldPosition);
+                _drawingLines.Last().AddPointIfPossible(GetMouseWorldPosition);
             }
         }
 
@@ -40,8 +76,13 @@ namespace Infrastructure
             get 
             {
                 var mousePosition = Input.mousePosition;
-                mousePosition.z += _camera.transform.position.z * -1;
-                return _camera.ScreenToWorldPoint(mousePosition);
+                var inBoundsPosition = mousePosition;
+                inBoundsPosition.x = Mathf.Max(inBoundsPosition.x, _drawingBoundsRect.x);
+                inBoundsPosition.y = Mathf.Max(inBoundsPosition.y, _drawingBoundsRect.y);
+                inBoundsPosition.x = Mathf.Min(inBoundsPosition.x, _drawingBoundsRect.x + _drawingBoundsRect.width);
+                inBoundsPosition.y = Mathf.Min(inBoundsPosition.y, _drawingBoundsRect.y + _drawingBoundsRect.height);
+                inBoundsPosition.z += _camera.transform.position.z * -1;
+                return _camera.ScreenToWorldPoint(inBoundsPosition);
             }
         }
     }
