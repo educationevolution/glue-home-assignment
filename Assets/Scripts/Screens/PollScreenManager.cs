@@ -19,18 +19,22 @@ namespace Screens
 
     public class PollScreenManager : MonoBehaviour
     {
-        [SerializeField] private PollOptionUi _pollOptionUiPrefab;
         [SerializeField] private PollOptionPosition[] _pollOptionPositions;
         [SerializeField] private RectTransform _pollOptionsContainer;
         [SerializeField] private TextMeshProUGUI _pollQuestionText;
         [SerializeField] private CountdownTimerUi _countdownTimer;
         [SerializeField] private PollBottomBar _bottomBar;
         [SerializeField] private DrawingController _drawingController;
+        [SerializeField] private RectTransform _pollResultsContainer;
+        [SerializeField] private PollOptionUi _pollOptionUiPrefab;
+        [SerializeField] private PollOptionResultUi _optionResultUiPrefab;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
         private int? _lastSelectedId;
         private Dictionary<int, PollOptionUi> _pollOptionUiById;
         private PollPhase _pollPhase;
         private bool _isDrawingEnabled;
+        private EnterPollResponseData PollProperties => ClientServices.Instance.PollStore.CurrentPollProperties;
+        private PollResultsResponseData PollResults => ClientServices.Instance.PollStore.CurrentPollResults;
 
         private void Awake()
         {
@@ -49,13 +53,20 @@ namespace Screens
             _bottomBar.OnDrawingButtonClicked += DrawingButtonClickedCallback;
             _bottomBar.OnGalleryButtonClicked += GalleryButtonClickedCallback;
             _bottomBar.OnStickersButtonClicked += StickersButtonClickedCallback;
+            var children = _pollResultsContainer.GetComponentsInChildren<PollOptionResultUi>();
+            for (var i = 0; i < children.Length; i++)
+            {
+                var child = children[i];
+                Destroy(child.gameObject);
+            }
+            FakeServerLink.Instance.OnPollResultsDataReceived += HandlePollResultsReceived;
         }
         
         private void Start()
         {
             SetPollPhase(PollPhase.Spectate);
 #if UNITY_EDITOR
-            if (PollServerData == null)
+            if (PollProperties == null)
             {
                 // Required only when running this scene directly
                 FakeServerLink.Instance.SendRequestToServer(new EnterPollRequest(), null);
@@ -69,7 +80,7 @@ namespace Screens
 #if UNITY_EDITOR
         private IEnumerator DisplayPollWhenReady()
         {
-            while (PollServerData == null)
+            while (PollProperties == null)
             {
                 yield return null;
             }
@@ -91,26 +102,29 @@ namespace Screens
             throw new Exception($"Unhandled {nameof(PollOptionPositionCategory)} {category}!");
         }
 
-        private EnterPollResponseData PollServerData => ClientServices.Instance.PollStore.CurrentPollServerData;
-
         private void SetPollPhase(PollPhase pollPhase)
         {
             _pollPhase = pollPhase;
+            if (_pollPhase == PollPhase.Results)
+            {
+                _drawingController.SetIsEnabled(false);
+                _drawingController.Clear();
+            }
             _bottomBar.RefreshUi(_pollPhase);
             _bottomBar.RefreshDrawingButtonSprite(_isDrawingEnabled);
         }
 
         public void DisplayPoll()
         {
-            _pollQuestionText.text = PollServerData.Question;
+            _pollQuestionText.text = PollProperties.Question;
 
             _pollOptionUiById = new();
-            var optionsCount = PollServerData.OptionsData.Count;
+            var optionsCount = PollProperties.OptionsData.Count;
             for (var i = 0; i < _optionPositionsByOptionsCount[optionsCount].Count; i++) 
             {
                 var optionPosition = _optionPositionsByOptionsCount[optionsCount][i];
                 var newOptionUi = Instantiate(_pollOptionUiPrefab, _pollOptionsContainer);
-                var optionData = PollServerData.OptionsData[i];
+                var optionData = PollProperties.OptionsData[i];
                 newOptionUi.RectTransform.position = optionPosition.transform.position;
                 newOptionUi.Initialize(new PollOptionUiInitializeData()
                 {
@@ -121,7 +135,34 @@ namespace Screens
                 newOptionUi.OnClicked += OptionClickedCallback;
                 _pollOptionUiById.Add(i, newOptionUi);
             }
-            _countdownTimer.StartCountdown(63.3f);
+            _countdownTimer.StartCountdown(PollProperties.SecondsLeft);
+        }
+
+        private void HandlePollResultsReceived()
+        {
+            SetPollPhase(PollPhase.Results);
+            var winningOptionIndex = 0;
+            var highestResult01 = 0f;
+            for (var i = 0; i < PollResults.Results01.Count; i++)
+            {
+                var result01 = PollResults.Results01[i];
+                if (highestResult01 < result01)
+                {
+                    highestResult01 = result01;
+                    winningOptionIndex = i;
+                }
+            }
+
+            for (var i = 0; i < PollProperties.OptionsData.Count; i++)
+            {
+                var optionResultUi = ObjectPool.Instance.Borrow(_optionResultUiPrefab, _pollResultsContainer).GetComponent<PollOptionResultUi>();
+                var result01 = PollResults.Results01[i];
+                var isUserChoice = _lastSelectedId == null ?
+                    false : _lastSelectedId.Value == i;
+                var isWinningOption = winningOptionIndex == i;
+                optionResultUi.DisplayResult(result01, isWinningOption: isWinningOption, 
+                    isUserChoice: isUserChoice);
+            }
         }
 
         private void OptionClickedCallback(int id)

@@ -18,6 +18,7 @@ namespace ServerClientCommunication
     {
         public static FakeServerLink Instance { get; private set; }
         public Action<ServerChatMessageData> OnChatMessageDataReceived;
+        public Action OnPollResultsDataReceived;
         private Dictionary<int, Coroutine> _fakeRequestsById;
         private int _nextRequestId;
 
@@ -84,11 +85,20 @@ namespace ServerClientCommunication
             else if (request is EnterPollRequest)
             {
                 var enterPollReponse = new EnterPollResponse(isSuccess: true);
-                ClientServices.Instance.PollStore.SetCurrentPollServerData(enterPollReponse.Data);
+                ClientServices.Instance.PollStore.SetCurrentPollProperties(enterPollReponse.Data);
                 responseHandler?.Invoke(reponse);
+                StartCoroutine(FakePollResultsResponseCoroutine(enterPollReponse.Data.SecondsLeft));
             }
 
             GenericCanvas.Instance.HideGenericLoadingMessage();
+        }
+
+        private IEnumerator FakePollResultsResponseCoroutine(float secondsLeftToEndPoll)
+        {
+            yield return new WaitForSeconds(secondsLeftToEndPoll);
+            var pollResultsReponse = new PollResultsResponse(isSuccess: true);
+            ClientServices.Instance.PollStore.SetCurrentPollResults(pollResultsReponse.Data);
+            OnPollResultsDataReceived?.Invoke();
         }
 
         private IEnumerator FakeChatMessagesCoroutine()

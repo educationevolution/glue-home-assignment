@@ -15,6 +15,7 @@ namespace ServerClientCommunication
         public int Id;
         public string Question;
         public List<PollOptionData> OptionsData;
+        public float SecondsLeft;
     }
 
     public class EnterPollResponse : BaseServerResponse
@@ -27,6 +28,7 @@ namespace ServerClientCommunication
             {
                 Id = Random.Range(0, 9999),
                 Question = "WHO IS THE<BR>BEST SINGER?",
+                SecondsLeft = 5f,
                 OptionsData = new List<PollOptionData>()
                 {
                     new PollOptionData()

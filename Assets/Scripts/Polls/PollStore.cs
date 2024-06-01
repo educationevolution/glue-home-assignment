@@ -7,11 +7,17 @@ namespace Polls
 {
     public class PollStore
     {
-        public EnterPollResponseData CurrentPollServerData { get; private set; }
+        public EnterPollResponseData CurrentPollProperties { get; private set; }
+        public PollResultsResponseData CurrentPollResults { get; private set; }
 
-        public void SetCurrentPollServerData(EnterPollResponseData data)
+        public void SetCurrentPollProperties(EnterPollResponseData data)
         {
-            CurrentPollServerData = data;
+            CurrentPollProperties = data;
+        }
+
+        public void SetCurrentPollResults(PollResultsResponseData data)
+        {
+            CurrentPollResults = data;
         }
     }
 }
