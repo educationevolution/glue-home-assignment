@@ -3,12 +3,11 @@ using UiElements;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using Infrastructure;
-using static UnityEditor.Progress;
 using UnityEngine.UI;
 using Chat;
+using DragableImages;
 
 namespace Screens
 {
@@ -35,6 +34,7 @@ namespace Screens
         [SerializeField] private RectTransform _rootContainer;
         [SerializeField] private ChatMessagesDisplayer _chatMessagesDisplayer;
         [SerializeField] private PollResultsCallToAction _resultsCallToAction;
+        [SerializeField] private GalleryImagesController _galleryImagesController;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
         private int? _lastSelectedId;
         private List<PollOptionUi> _pollOptionsUi;
@@ -74,8 +74,7 @@ namespace Screens
                 Destroy(child.gameObject);
             }
 
-            // Listen for relevant server responses
-            FakeServerLink.Instance.OnPollResultsDataReceived += HandlePollResultsReceived;
+            _galleryImagesController.Initialize(GetPollPhase);
         }
 
         private void OnDestroy()
@@ -85,6 +84,8 @@ namespace Screens
 
         private void Start()
         {
+            // Listen for relevant server responses
+            FakeServerLink.Instance.OnPollResultsDataReceived += HandlePollResultsReceived;
 #if UNITY_EDITOR
             SetPollPhase(PollPhase.EditorOnlyWaitingForData);
             if (PollProperties == null)
@@ -142,11 +143,14 @@ namespace Screens
                 _drawingController.Clear();
                 _chatMessagesDisplayer.Deactivate();
                 _resultsCallToAction.Activate();
+                _galleryImagesController.HideAll();
             }
             _bottomBar.RefreshUi(_pollPhase);
             _bottomBar.RefreshDrawingButtonSprite(_isDrawingEnabled);
             _topUi.UpdateUi(_pollPhase);
         }
+
+        private PollPhase GetPollPhase() => _pollPhase;
 
         public void DisplayPoll()
         {
@@ -258,6 +262,7 @@ namespace Screens
         private void GalleryButtonClickedCallback()
         {
             SetIsDrawingEnabled(false);
+            _galleryImagesController.GetImageFromGallery();
         }
 
         private void StickersButtonClickedCallback()

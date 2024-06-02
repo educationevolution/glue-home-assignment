@@ -21,7 +21,7 @@ namespace UiElements
             _resultsTitleText.gameObject.SetActive(phase == PollPhase.Results);
             _questionText.text = phase == PollPhase.EditorOnlyWaitingForData ?
                 string.Empty : PollStore.CurrentPollProperties.Question;
-            var isCountdownTimerActive = phase != PollPhase.EditorOnlyWaitingForData && phase != PollPhase.Results;
+            var isCountdownTimerActive = phase == PollPhase.Spectate || phase == PollPhase.WaitingForAnswer || phase == PollPhase.WaitingForResults;
             _countdownTimer.gameObject.SetActive(isCountdownTimerActive);
             if (phase == PollPhase.Spectate)
             {

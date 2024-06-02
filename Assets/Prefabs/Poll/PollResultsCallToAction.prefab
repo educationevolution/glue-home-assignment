@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8651059160066846726}
   - component: {fileID: 1659828098541553327}
   m_Layer: 5
-  m_Name: ResultsCallToAction
+  m_Name: PollResultsCallToAction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
