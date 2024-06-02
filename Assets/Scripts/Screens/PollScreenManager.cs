@@ -35,6 +35,7 @@ namespace Screens
         [SerializeField] private ChatMessagesDisplayer _chatMessagesDisplayer;
         [SerializeField] private PollResultsCallToAction _resultsCallToAction;
         [SerializeField] private GalleryImagesController _galleryImagesController;
+        [SerializeField] private StickersInventoryUi _stickersInventory;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
         private int? _lastSelectedId;
         private List<PollOptionUi> _pollOptionsUi;
@@ -144,6 +145,7 @@ namespace Screens
                 _chatMessagesDisplayer.Deactivate();
                 _resultsCallToAction.Activate();
                 _galleryImagesController.HideAll();
+                _stickersInventory.HideAll();
             }
             _bottomBar.RefreshUi(_pollPhase);
             _bottomBar.RefreshDrawingButtonSprite(_isDrawingEnabled);
@@ -268,6 +270,7 @@ namespace Screens
         private void StickersButtonClickedCallback()
         {
             SetIsDrawingEnabled(false);
+            _stickersInventory.Activate();
         }
 
         private void ExitPollClickedCallback()

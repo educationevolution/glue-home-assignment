@@ -13,6 +13,15 @@ namespace Effects
         private float? _targetScale;
         private float? _bounceStartTime;
         private float _bounceDuration;
+        private Vector2 _originAnchoredPosition;
+        private RectTransform _rectTrans;
+        private Vector2? _targetAnchoredPosition;
+
+        private void Awake()
+        {
+            _rectTrans = GetComponent<RectTransform>();
+            _originAnchoredPosition = _rectTrans.anchoredPosition;
+        }
 
         public void ResetAll()
         {
@@ -23,6 +32,8 @@ namespace Effects
             }
             _targetScale = null;
             transform.localScale = Vector3.one;
+            _rectTrans.anchoredPosition = _originAnchoredPosition;
+            _targetAnchoredPosition = null;
         }
 
         public void AnimateToFullTransparency()
@@ -41,11 +52,40 @@ namespace Effects
             _bounceDuration = duration;
         }
 
+        public void MoveToPosition(Vector2 deltaFromOriginPosition, bool isImmediate = false)
+        {
+            if (isImmediate)
+            {
+                _rectTrans.anchoredPosition = _originAnchoredPosition + deltaFromOriginPosition;
+                return;
+            }
+            _targetAnchoredPosition = _originAnchoredPosition + deltaFromOriginPosition;
+        }
+
         private void Update()
         {
             AlphaUpdate();
             ScaleUpdate();
             BounceUpdate();
+            MoveToPositionUpdate();
+        }
+
+        private void MoveToPositionUpdate()
+        {
+            if (_targetAnchoredPosition == null)
+            {
+                return;
+            }
+            var delta = _targetAnchoredPosition.Value - _rectTrans.anchoredPosition;
+            if (delta.magnitude < 1)
+            {
+                _rectTrans.anchoredPosition = _targetAnchoredPosition.Value;
+                _targetAnchoredPosition = null;
+                return;
+            }
+            const float ANCHORED_POSITION_DELTA_MULTIPLIER = 0.15f;
+            var movementDelta = delta * ANCHORED_POSITION_DELTA_MULTIPLIER;
+            _rectTrans.anchoredPosition += movementDelta;
         }
 
         private void BounceUpdate()

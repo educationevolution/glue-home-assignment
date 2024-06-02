@@ -12,13 +12,40 @@ namespace UiElements
         [SerializeField] private RectTransform _rootRectTrans;
         [SerializeField] private Image _image;
         [SerializeField] private GenericUiElementAnimator _genericAnimator;
-        
+        private bool _isManualDragActive;
+
         private void Awake()
         {
             //_button.OnPointerDown += ButtonMouseDownCallback;
         }
 
         private void OnMouseDrag()
+        {
+            SetAtMousePosition();
+        }
+
+        private void Update()
+        {
+            if (_isManualDragActive == false)
+            {
+                return;
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                _isManualDragActive = false;
+            } else
+            {
+                SetAtMousePosition();
+            }
+        }
+
+        public void StartManualDrag()
+        {
+            SetAtMousePosition();
+            _isManualDragActive = true;
+        }
+
+        private void SetAtMousePosition()
         {
             var newPosition = Input.mousePosition;
             newPosition.z = _rootRectTrans.position.z;
@@ -31,9 +58,23 @@ namespace UiElements
         {
             var rect = new Rect(0, 0, texture.width, texture.height);
             var sprite = Sprite.Create(texture, rect, pivot: Vector2.zero, pixelsPerUnit: 100f);
+            ShowImageInternal(sprite);
+        }
+
+        public void ShowImage(string imageUrl, bool bounce)
+        {
+            var sprite = ClientServices.Instance.ImageStore.LoadImage(imageUrl);
+            ShowImageInternal(sprite, bounce);
+        }
+
+        private void ShowImageInternal(Sprite sprite, bool bounce = true)
+        {
             _image.sprite = sprite;
-            const float BOUNCE_DURATION = 0.2f;
-            _genericAnimator.Bounce(BOUNCE_DURATION);
+            if (bounce)
+            {
+                const float BOUNCE_DURATION = 0.2f;
+                _genericAnimator.Bounce(BOUNCE_DURATION);
+            }
         }
 
         public void AnimateToFullTransparency()
@@ -49,6 +90,7 @@ namespace UiElements
         public override void HandlePreRevertToPool()
         {
             _genericAnimator.ResetAll();
+            _isManualDragActive = false;
         }
     }
 }
