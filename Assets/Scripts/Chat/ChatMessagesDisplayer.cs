@@ -15,8 +15,7 @@ namespace Chat
         [SerializeField] private int _maxDisplayedMessages = 10;
         [SerializeField] private RectTransform _messagesContainer;
         private List<ChatMessageUi> _messages = new();
-        private float _nextMessageTime;
-        private int _messageCounter;
+        private bool _isActive;
 
         private void Awake()
         {
@@ -31,11 +30,28 @@ namespace Chat
             }
         }
 
-        private void Start()
+        public void Activate()
         {
+            if (_isActive)
+            {
+                return;
+            }
+            _isActive = true;
             FakeServerLink.Instance.OnChatMessageDataReceived += HandleChatMessageDataReceived;
+            _messagesContainer.gameObject.SetActive(true);
         }
 
+        public void Deactivate()
+        {
+            if (_isActive == false)
+            {
+                return;
+            }
+            _isActive = false;
+            FakeServerLink.Instance.OnChatMessageDataReceived -= HandleChatMessageDataReceived;
+            _messagesContainer.gameObject.SetActive(false);
+        }
+        
         private void HandleChatMessageDataReceived(ServerChatMessageData messageData)
         {
             if (_messages.Count >= _maxDisplayedMessages)

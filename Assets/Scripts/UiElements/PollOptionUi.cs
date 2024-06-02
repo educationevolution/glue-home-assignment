@@ -1,3 +1,4 @@
+using Effects;
 using Infrastructure;
 using System;
 using System.Collections;
@@ -17,15 +18,19 @@ namespace UiElements
 
     public class PollOptionUi : MonoBehaviour
     {
-        [SerializeField] private RectTransform _rectTransform;
+        [SerializeField] private RectTransform _rootRectTransform;
+        [SerializeField] private RectTransform _imageRectTransform;
         [SerializeField] private Image _mainImage;
         [SerializeField] private RectTransform _sparksContainer;
         [SerializeField] private Button _button;
         [SerializeField] private TextMeshProUGUI[] _titleTexts;
         [SerializeField] private RectTransform[] _nonSelectedContainers;
         [SerializeField] private RectTransform[] _selectedContainers;
+        [SerializeField] private GenericUiElementAnimator _genericAnimator;
         public Action<int> OnClicked;
-        public RectTransform RectTransform => _rectTransform;
+        public RectTransform RootRectTransform => _rootRectTransform;
+        public Vector3 ImageRectPosition => _imageRectTransform.position;
+        public Vector2 ImageSize => new Vector2(_imageRectTransform.rect.width, _imageRectTransform.rect.height);
         private int _optionId;
 
         private void Awake()
@@ -65,6 +70,11 @@ namespace UiElements
         private void ButtonClickedCallback()
         {
             OnClicked?.Invoke(_optionId);
+        }
+
+        public void AnimateToFullTransparency()
+        {
+            _genericAnimator.AnimateToFullTransparency();
         }
     }
 }

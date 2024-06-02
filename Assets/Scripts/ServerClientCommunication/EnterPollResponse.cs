@@ -28,7 +28,7 @@ namespace ServerClientCommunication
             {
                 Id = Random.Range(0, 9999),
                 Question = "WHO IS THE<BR>BEST SINGER?",
-                SecondsLeft = 5f,
+                SecondsLeft = 1f,
                 OptionsData = new List<PollOptionData>()
                 {
                     new PollOptionData()

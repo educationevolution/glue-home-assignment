@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Infrastructure;
+using static UnityEditor.Progress;
+using UnityEngine.UI;
+using Chat;
 
 namespace Screens
 {
@@ -28,9 +31,13 @@ namespace Screens
         [SerializeField] private RectTransform _pollResultsContainer;
         [SerializeField] private PollOptionUi _pollOptionUiPrefab;
         [SerializeField] private PollOptionResultUi _optionResultUiPrefab;
+        [SerializeField] private RectTransform _rootContainer;
+        [SerializeField] private ChatMessagesDisplayer _chatMessagesDisplayer;
+        [SerializeField] private PollResultsCallToAction _resultsCallToAction;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
         private int? _lastSelectedId;
-        private Dictionary<int, PollOptionUi> _pollOptionUiById;
+        private List<PollOptionUi> _pollOptionsUi;
+        private List<PollOptionResultUi> _pollOptionResultsUi;
         private PollPhase _pollPhase;
         private bool _isDrawingEnabled;
         private EnterPollResponseData PollProperties => ClientServices.Instance.PollStore.CurrentPollProperties;
@@ -96,8 +103,6 @@ namespace Screens
                     return 2;
                 case PollOptionPositionCategory.ThreeOptions:
                     return 3;
-                case PollOptionPositionCategory.FourOptions:
-                    return 4;
             }
             throw new Exception($"Unhandled {nameof(PollOptionPositionCategory)} {category}!");
         }
@@ -105,10 +110,17 @@ namespace Screens
         private void SetPollPhase(PollPhase pollPhase)
         {
             _pollPhase = pollPhase;
-            if (_pollPhase == PollPhase.Results)
+            if (_pollPhase == PollPhase.Spectate)
+            {
+                _chatMessagesDisplayer.Activate();
+                _resultsCallToAction.Deactivate();
+            }
+            else if (_pollPhase == PollPhase.Results)
             {
                 _drawingController.SetIsEnabled(false);
                 _drawingController.Clear();
+                _chatMessagesDisplayer.Deactivate();
+                _resultsCallToAction.Activate();
             }
             _bottomBar.RefreshUi(_pollPhase);
             _bottomBar.RefreshDrawingButtonSprite(_isDrawingEnabled);
@@ -118,22 +130,22 @@ namespace Screens
         {
             _pollQuestionText.text = PollProperties.Question;
 
-            _pollOptionUiById = new();
+            _pollOptionsUi = new();
             var optionsCount = PollProperties.OptionsData.Count;
             for (var i = 0; i < _optionPositionsByOptionsCount[optionsCount].Count; i++) 
             {
                 var optionPosition = _optionPositionsByOptionsCount[optionsCount][i];
-                var newOptionUi = Instantiate(_pollOptionUiPrefab, _pollOptionsContainer);
+                var newOptionResultUi = Instantiate(_pollOptionUiPrefab, _pollOptionsContainer);
                 var optionData = PollProperties.OptionsData[i];
-                newOptionUi.RectTransform.position = optionPosition.transform.position;
-                newOptionUi.Initialize(new PollOptionUiInitializeData()
+                newOptionResultUi.RootRectTransform.position = optionPosition.transform.position;
+                newOptionResultUi.Initialize(new PollOptionUiInitializeData()
                 {
                     Id = i,
                     Title = optionData.Title,
                     ImageUrl = optionData.ImageUrl
                 });
-                newOptionUi.OnClicked += OptionClickedCallback;
-                _pollOptionUiById.Add(i, newOptionUi);
+                newOptionResultUi.OnClicked += OptionClickedCallback;
+                _pollOptionsUi.Add(newOptionResultUi);
             }
             _countdownTimer.StartCountdown(PollProperties.SecondsLeft);
         }
@@ -153,15 +165,38 @@ namespace Screens
                 }
             }
 
+            _pollOptionResultsUi = new();
             for (var i = 0; i < PollProperties.OptionsData.Count; i++)
             {
-                var optionResultUi = ObjectPool.Instance.Borrow(_optionResultUiPrefab, _pollResultsContainer).GetComponent<PollOptionResultUi>();
+                var newOptionResultUi = ObjectPool.Instance.Borrow(_optionResultUiPrefab, _pollResultsContainer).GetComponent<PollOptionResultUi>();
+                _pollOptionResultsUi.Add(newOptionResultUi);
+            }
+
+            // Forcing horizontal layout group to rebuild in order to measure the delta between the option images
+            // in the OptionUi components to their corresponding OptionResultUi components.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_pollResultsContainer);
+
+            for (var i = 0; i < _pollOptionResultsUi.Count; i++) 
+            {
+                var optionUi = _pollOptionsUi[i];
+                optionUi.AnimateToFullTransparency();
+                var optionData = PollProperties.OptionsData[i];
                 var result01 = PollResults.Results01[i];
                 var isUserChoice = _lastSelectedId == null ?
                     false : _lastSelectedId.Value == i;
                 var isWinningOption = winningOptionIndex == i;
-                optionResultUi.DisplayResult(result01, isWinningOption: isWinningOption, 
-                    isUserChoice: isUserChoice);
+                var newOptionResultUi = _pollOptionResultsUi[i];
+                var positionDeltaFromOptionToResult = optionUi.ImageRectPosition - newOptionResultUi.RectTransform.position;
+                var uiData = new PollOptionResultData()
+                {
+                    Ratio01 = result01,
+                    IsUserChoice = isUserChoice,
+                    IsWinningOption = isWinningOption,
+                    ImageUrl = optionData.ImageUrl,
+                    PositionDeltaToOptionImage = positionDeltaFromOptionToResult,
+                    ImageOriginSize = optionUi.ImageSize
+                };
+                newOptionResultUi.DisplayResult(uiData);
             }
         }
 
@@ -173,10 +208,10 @@ namespace Screens
                 {
                     return;
                 }
-                _pollOptionUiById[_lastSelectedId.Value].SetIsSelected(false);
+                _pollOptionsUi[_lastSelectedId.Value].SetIsSelected(false);
             }
             _lastSelectedId = id;
-            _pollOptionUiById[_lastSelectedId.Value].SetIsSelected(true);
+            _pollOptionsUi[_lastSelectedId.Value].SetIsSelected(true);
         }
 
         private void StartPollButtonClickedCallback()

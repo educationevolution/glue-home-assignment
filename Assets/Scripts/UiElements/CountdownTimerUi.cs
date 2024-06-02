@@ -8,6 +8,8 @@ namespace UiElements
     public class CountdownTimerUi : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _timeLeftText;
+        [SerializeField] private int _maxSecondsForTimeEndingWarning;
+        [SerializeField] private Color _timeEndingWarningColor;
         private Coroutine _countdownCoroutine;
         private float _realtimeSinceStartupCountdownEnd;
 
@@ -46,6 +48,10 @@ namespace UiElements
             timeLeftStr += secondsLeft > 9 ?
                 secondsLeft : $"0{secondsLeft}";
             _timeLeftText.text = timeLeftStr;
+            
+            var color = secondsLeft <= _maxSecondsForTimeEndingWarning && minutesLeft == 0 ?
+                _timeEndingWarningColor : Color.white;
+            _timeLeftText.color = color;
         }
 
         public void EndCountdown()

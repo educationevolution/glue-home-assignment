@@ -1,3 +1,4 @@
+using Effects;
 using Infrastructure;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,17 +8,29 @@ using UnityEngine.UI;
 
 namespace UiElements
 {
+    public struct PollOptionResultData
+    {
+        public float Ratio01;
+        public bool IsWinningOption;
+        public bool IsUserChoice;
+        public string ImageUrl;
+        public Vector3 PositionDeltaToOptionImage;
+        public Vector2 ImageOriginSize;
+    }
+
     public class PollOptionResultUi : PooledObject
     {
-        const float MAX_ANIMATION_TIME = 2f;
+        const float MAX_ANIMATION_TIME = 1f;
 
         [SerializeField] private RectTransform _rootRectTransform;
         [SerializeField] private TextMeshProUGUI _resultPercentText;
-        [SerializeField] private RectTransform _mainImageContainer;
-        [SerializeField] private Image _mainImage;
         [SerializeField] private TextMeshProUGUI _yourChoiceText;
         [SerializeField] private RectTransform _voterAvatarsContainer;
         [SerializeField] private RectTransform _winningChoiceEffectsContainer;
+        [Header("Main Image")]
+        [SerializeField] private RectTransform _mainImageContainer;
+        [SerializeField] private Image _mainImage;
+        [SerializeField] private GenericUiElementAnimator _mainImageGenericAnimator;
         [Header("Voters Bar")]
         [SerializeField] private RectTransform _votersBar;
         [SerializeField] private Image _votersBarImage;
@@ -29,42 +42,68 @@ namespace UiElements
         [Header("Unity Editor")]
         [SerializeField] private Canvas _canvasForGizmos;
 #endif
+        public RectTransform RectTransform => _rootRectTransform;
         private Coroutine _animationCoroutine;
+        private Vector3 _imageOriginPosition;
 
         private void Awake()
         {
             
         }
 
-        
-        public void DisplayResult(float ratio01, bool isWinningOption, bool isUserChoice)
+        public void DisplayResult(PollOptionResultData data)
         {
-            _winningChoiceEffectsContainer.gameObject.SetActive(isWinningOption);
-            _yourChoiceText.gameObject.SetActive(isUserChoice);
-            _votersBarImage.sprite = isUserChoice ?
+            _winningChoiceEffectsContainer.gameObject.SetActive(data.IsWinningOption);
+            _yourChoiceText.gameObject.SetActive(data.IsUserChoice);
+            _votersBarImage.sprite = data.IsUserChoice ?
                 _votersBarUserChoiceSprite : _votersBarDefaultSprite;
-            _animationCoroutine = StartCoroutine(DisplayResultCoroutine(ratio01));
+            if (data.IsWinningOption)
+            {
+                const float WINNING_OPTION_SCALE = 1.3f;
+                _mainImageGenericAnimator.AnimateToNewScale(WINNING_OPTION_SCALE);
+            }
+            _animationCoroutine = StartCoroutine(DisplayResultCoroutine(data.PositionDeltaToOptionImage, data.Ratio01));
+            _mainImage.sprite = ClientServices.Instance.ImageStore.LoadImage(data.ImageUrl);
         }
 
-        private IEnumerator DisplayResultCoroutine(float ratio01)
+        private IEnumerator DisplayResultCoroutine(Vector3 positionDeltaToOptionImage, float ratio01)
         {
+            _imageOriginPosition = _mainImageContainer.position;
+            positionDeltaToOptionImage.z = 0;
+            _mainImageContainer.position += positionDeltaToOptionImage;
             SetVotersBarHeight(_initialVotersBarHeight);
+
+            yield return new WaitForSeconds(0.2f);
+
+            var deltaToTargetPosition = _imageOriginPosition - _mainImageContainer.position;
+            const float MAX_DELTA_TO_END_ANIMATION = 0.1f;
+            const float DELTA_MOVEMENT_MULTIPLIER = 0.1f;
+            while (deltaToTargetPosition.magnitude > MAX_DELTA_TO_END_ANIMATION)
+            {
+                _mainImageContainer.position += deltaToTargetPosition * DELTA_MOVEMENT_MULTIPLIER;
+                deltaToTargetPosition = _imageOriginPosition - _mainImageContainer.position;
+                yield return null;
+            }
+            _mainImageContainer.position = _imageOriginPosition;
+
+            yield return new WaitForSeconds(0.4f);
+
             var targetVotersBarHeightAddon = _maxVotersBarHeightAddon * ratio01;
             var currentAnimationDuration = MAX_ANIMATION_TIME * ratio01;
             var animationStartTime = Time.time;
             var animationEndTime = animationStartTime + currentAnimationDuration;
-            var votePct = 0;
-            _resultPercentText.text = $"{votePct}%";
+            var lastVotePct = 0;
+            _resultPercentText.text = $"{lastVotePct}%";
             while (Time.time < animationEndTime)
             {
                 var animationProgressRatio01 = (Time.time - animationStartTime) / currentAnimationDuration;
                 var votersBarHeight = _initialVotersBarHeight + targetVotersBarHeightAddon * animationProgressRatio01;
                 SetVotersBarHeight(votersBarHeight);
                 var newVotePct = Mathf.CeilToInt(animationProgressRatio01 * 100);
-                if (votePct != newVotePct)
+                if (lastVotePct != newVotePct)
                 {
-                    votePct = newVotePct;
-                    _resultPercentText.text = $"{votePct}%";
+                    lastVotePct = newVotePct;
+                    _resultPercentText.text = $"{lastVotePct}%";
                 }
                 yield return null;
             }
@@ -91,6 +130,8 @@ namespace UiElements
                 StopCoroutine(_animationCoroutine);
                 _animationCoroutine = null;
             }
+            _mainImageContainer.position = _imageOriginPosition;
+            _mainImageGenericAnimator.ResetAll();
         }
 
 #if UNITY_EDITOR

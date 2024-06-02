@@ -9,7 +9,6 @@ namespace UiElements
     {
         TwoOptions,
         ThreeOptions,
-        FourOptions,
     }
 
     public class PollOptionPosition : MonoBehaviour
@@ -27,8 +26,6 @@ namespace UiElements
                     return Color.yellow;
                 case PollOptionPositionCategory.ThreeOptions:
                     return Color.red;
-                case PollOptionPositionCategory.FourOptions:
-                    return Color.white;
             }
             throw new Exception($"Unhandled {nameof(PollOptionPositionCategory)} {_category}!");
         }
