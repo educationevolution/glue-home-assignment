@@ -41,6 +41,7 @@ namespace Infrastructure
             {
                 throw new Exception($"Scene {sceneToLoad} is already opened!");
             }
+            ObjectPool.Instance.RevertAllInstancesToPool();
             _currentScene = sceneToLoad;
             SceneManager.LoadScene(_currentScene.ToString());
         }

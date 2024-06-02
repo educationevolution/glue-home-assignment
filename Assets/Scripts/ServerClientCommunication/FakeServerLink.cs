@@ -89,6 +89,11 @@ namespace ServerClientCommunication
                 responseHandler?.Invoke(reponse);
                 StartCoroutine(FakePollResultsResponseCoroutine(enterPollReponse.Data.SecondsLeft));
             }
+            else if (request is ExitPollRequest)
+            {
+                var exitPollResponse = new ExitPollResponse(isSuccess: true);
+                responseHandler?.Invoke(reponse);
+            }
 
             GenericCanvas.Instance.HideGenericLoadingMessage();
         }

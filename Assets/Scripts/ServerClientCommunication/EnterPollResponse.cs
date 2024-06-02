@@ -21,15 +21,15 @@ namespace ServerClientCommunication
     public class EnterPollResponse : BaseServerResponse
     {
         public EnterPollResponseData Data;
+        private static int _lastOptionsCount = 2;
 
         public EnterPollResponse(bool isSuccess) : base(isSuccess)
         {
-            Data = new EnterPollResponseData()
-            {
-                Id = Random.Range(0, 9999),
-                Question = "WHO IS THE<BR>BEST SINGER?",
-                SecondsLeft = 1f,
-                OptionsData = new List<PollOptionData>()
+            // Simulating between showing a poll with 2 and 3 options.
+            _lastOptionsCount = _lastOptionsCount == 2 ?
+                3 : 2;
+
+            var optionsData = new List<PollOptionData>()
                 {
                     new PollOptionData()
                     {
@@ -41,12 +41,24 @@ namespace ServerClientCommunication
                         Title = "Ariana",
                         ImageUrl = "Images/Ariana",
                     },
-                    new PollOptionData()
-                    {
-                        Title = "Taylor",
-                        ImageUrl = "Images/Taylor",
-                    }
-                }
+                    
+                };
+
+            if (_lastOptionsCount == 3)
+            {
+                optionsData.Add(new PollOptionData()
+                {
+                    Title = "Taylor",
+                    ImageUrl = "Images/Taylor",
+                });
+            }
+
+            Data = new EnterPollResponseData()
+            {
+                Id = Random.Range(0, 9999),
+                Question = "WHO IS THE<BR>BEST SINGER?",
+                SecondsLeft = 5f,
+                OptionsData = optionsData
             };
         }
     }

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8651059160066846725}
   - component: {fileID: 8651059160066846726}
+  - component: {fileID: 1659828098541553327}
   m_Layer: 5
   m_Name: ResultsCallToAction
   m_TagString: Untagged
@@ -56,6 +57,53 @@ MonoBehaviour:
   _pollEndedTitleText: {fileID: 8651059161694328063}
   _pollEndedDescriptionText: {fileID: 8651059160892356188}
   _exitPollButton: {fileID: 8651059161949942928}
+  _genericAnimator: {fileID: 1659828098541553327}
+--- !u!114 &1659828098541553327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8651059160066846724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26d0f7c469e09eb41920b4ccb4802ee5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvasGroupTransparency: {fileID: 0}
+  _bounceAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.004257202
+      value: 0.0030670166
+      inSlope: 2.3153512
+      outSlope: 2.3153512
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.4703326
+      value: 1.0821953
+      inSlope: 1.0800842
+      outSlope: 1.0800842
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: -0.15518282
+      outSlope: -0.15518282
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8651059160812680981
 GameObject:
   m_ObjectHideFlags: 0

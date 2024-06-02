@@ -13,8 +13,8 @@ namespace Infrastructure
     public class ObjectPool : MonoBehaviour
     {
         public static ObjectPool Instance { get; private set; }
-        private Dictionary<int, List<PooledObject>> _inactivePool = new();
-        private Dictionary<int, List<PooledObject>> _activePool = new();
+        private Dictionary<int, List<PooledObject>> _objectsPoolByPrefabInstanceId = new();
+        private Dictionary<int, List<PooledObject>> _borrowedInstancesByObjectInstanceId = new();
         private Dictionary<int, int> _prefabInstanceIdByObjectInstanceId = new();
 
         private void Awake()
@@ -31,20 +31,21 @@ namespace Infrastructure
         public PooledObject Borrow(PooledObject prefab, Transform parent)
         {
             var prefabInstanceId = prefab.GetInstanceID();
-            if (_inactivePool.ContainsKey(prefabInstanceId) == false || _inactivePool[prefabInstanceId].Count == 0)
+            if (_borrowedInstancesByObjectInstanceId.ContainsKey(prefabInstanceId) == false)
+            {
+                _borrowedInstancesByObjectInstanceId[prefabInstanceId] = new();
+            }
+            if (_objectsPoolByPrefabInstanceId.ContainsKey(prefabInstanceId) == false || _objectsPoolByPrefabInstanceId[prefabInstanceId].Count == 0)
             {
                 var newInstance = Instantiate(prefab, parent);
-                if (_activePool.ContainsKey(prefabInstanceId) == false)
-                {
-                    _activePool[prefabInstanceId] = new();
-                }
-                _activePool[prefabInstanceId].Add(newInstance);
+                _borrowedInstancesByObjectInstanceId[prefabInstanceId].Add(newInstance);
                 _prefabInstanceIdByObjectInstanceId[newInstance.GetInstanceID()] = prefabInstanceId;
                 newInstance.HandlePostBorrowFromPool();
                 return newInstance;
             }
-            var existingInstance = _inactivePool[prefabInstanceId][0];
-            _inactivePool[prefabInstanceId].RemoveAt(0);
+            var existingInstance = _objectsPoolByPrefabInstanceId[prefabInstanceId][0];
+            _objectsPoolByPrefabInstanceId[prefabInstanceId].RemoveAt(0);
+            _borrowedInstancesByObjectInstanceId[prefabInstanceId].Add(existingInstance);
             existingInstance.transform.SetParent(parent);
             existingInstance.HandlePostBorrowFromPool();
             return existingInstance;
@@ -55,12 +56,25 @@ namespace Infrastructure
             var prefabInstanceId = _prefabInstanceIdByObjectInstanceId[pooledObject.GetInstanceID()];
             pooledObject.HandlePreRevertToPool();
             pooledObject.transform.SetParent(transform);
-            _activePool[prefabInstanceId].Remove(pooledObject);
-            if (_inactivePool.ContainsKey(prefabInstanceId) == false)
+            _borrowedInstancesByObjectInstanceId[prefabInstanceId].Remove(pooledObject);
+            if (_objectsPoolByPrefabInstanceId.ContainsKey(prefabInstanceId) == false)
             {
-                _inactivePool[prefabInstanceId] = new();
+                _objectsPoolByPrefabInstanceId[prefabInstanceId] = new();
             }
-            _inactivePool[prefabInstanceId].Add(pooledObject);
+            _objectsPoolByPrefabInstanceId[prefabInstanceId].Add(pooledObject);
+        }
+
+        public void RevertAllInstancesToPool()
+        {
+            foreach (var prefabInstanceId in _borrowedInstancesByObjectInstanceId.Keys)
+            {
+                var borrowedInstances = _borrowedInstancesByObjectInstanceId[prefabInstanceId];
+                for (var i = 0; i < borrowedInstances.Count; i++)
+                {
+                    Revert(borrowedInstances[i]);
+                }
+            }
+            _borrowedInstancesByObjectInstanceId.Clear();
         }
     }
 }

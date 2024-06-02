@@ -1,4 +1,5 @@
 using Chat;
+using Effects;
 using Infrastructure;
 using Screens;
 using System;
@@ -21,6 +22,7 @@ namespace UiElements
         [SerializeField] private RectTransform _spectatePhaseContainer;
         [SerializeField] private RectTransform _participationPhaseContainer;
         [SerializeField] private RectTransform _resultsPhaseContainer;
+        [SerializeField] private GenericUiElementAnimator _startPollButtonGenericAnimator;
         public Action OnStartPollButtonClicked;
         public Action OnDrawingButtonClicked;
         public Action OnStickersButtonClicked;
@@ -66,6 +68,11 @@ namespace UiElements
         private void GalleryButtonClickedCallback()
         {
             OnGalleryButtonClicked?.Invoke();
+        }
+
+        public void BounceStartPollButton()
+        {
+            _startPollButtonGenericAnimator.Bounce();
         }
     }
 }

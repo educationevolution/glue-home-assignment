@@ -465,6 +465,7 @@ GameObject:
   - component: {fileID: 7352977101365586934}
   - component: {fileID: 7352977101365586935}
   - component: {fileID: 7352977101365586920}
+  - component: {fileID: 4463768454801748720}
   m_Layer: 5
   m_Name: StartPollButton
   m_TagString: Untagged
@@ -575,6 +576,61 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4463768454801748720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7352977101365586922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26d0f7c469e09eb41920b4ccb4802ee5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvasGroupTransparency: {fileID: 0}
+  _bounceAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.0017738342
+      value: 0.99905396
+      inSlope: 3.5285378
+      outSlope: 3.5285378
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.13932015
+      value: 1.4843913
+      inSlope: 1.3485113
+      outSlope: 1.3485113
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.84648705
+      value: 0.89637136
+      inSlope: -0.07823348
+      outSlope: -0.07823348
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.6750482
+      outSlope: 0.6750482
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &7352977101408824619
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,6 +881,7 @@ MonoBehaviour:
   _spectatePhaseContainer: {fileID: 7352977101897786258}
   _participationPhaseContainer: {fileID: 7352977101243510808}
   _resultsPhaseContainer: {fileID: 7352977100567624817}
+  _startPollButtonGenericAnimator: {fileID: 4463768454801748720}
 --- !u!1 &7352977101897786259
 GameObject:
   m_ObjectHideFlags: 0

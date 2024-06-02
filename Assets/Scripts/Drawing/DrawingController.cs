@@ -57,7 +57,7 @@ namespace Infrastructure
             {
                 _isButtonDown = true;
                 var newLine = ObjectPool.Instance.Borrow(_linePrefab, _linesContainer).GetComponent<DrawingLine>();
-                newLine.transform.position = GetMouseWorldPosition;
+                newLine.Initialize(GetMouseWorldPosition);
                 _drawingLines.Add(newLine);
                 return;
             } 

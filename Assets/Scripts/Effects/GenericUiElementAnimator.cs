@@ -8,8 +8,11 @@ namespace Effects
     public class GenericUiElementAnimator : MonoBehaviour
     {
         [SerializeField] private CanvasGroup _canvasGroupTransparency;
+        [SerializeField] private AnimationCurve _bounceAnimationCurve;
         private float? _targetAlpha;
         private float? _targetScale;
+        private float? _bounceStartTime;
+        private float _bounceDuration;
 
         public void ResetAll()
         {
@@ -32,10 +35,34 @@ namespace Effects
             _targetScale = scale;
         }
 
+        public void Bounce(float duration = 0.4f)
+        {
+            _bounceStartTime = Time.time;
+            _bounceDuration = duration;
+        }
+
         private void Update()
         {
             AlphaUpdate();
             ScaleUpdate();
+            BounceUpdate();
+        }
+
+        private void BounceUpdate()
+        {
+            if (_bounceStartTime == null)
+            {
+                return;
+            }
+            var bounceEndTime = _bounceStartTime + _bounceDuration;
+            if (Time.time > bounceEndTime)
+            {
+                _bounceStartTime = null;
+                SetLocalScale(1);
+                return;
+            }
+            var proressRatio01 = (Time.time - _bounceStartTime.Value) / _bounceDuration;
+            SetLocalScale(_bounceAnimationCurve.Evaluate(proressRatio01));
         }
 
         private void ScaleUpdate()

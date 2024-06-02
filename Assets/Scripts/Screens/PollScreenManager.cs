@@ -14,18 +14,19 @@ namespace Screens
 {
     public enum PollPhase
     {
+        EditorOnlyWaitingForData,
         Spectate,
         WaitingForAnswer,
         WaitingForResults,
-        Results
+        Results,
+        ExitingPoll
     }
 
     public class PollScreenManager : MonoBehaviour
     {
         [SerializeField] private PollOptionPosition[] _pollOptionPositions;
         [SerializeField] private RectTransform _pollOptionsContainer;
-        [SerializeField] private TextMeshProUGUI _pollQuestionText;
-        [SerializeField] private CountdownTimerUi _countdownTimer;
+        [SerializeField] private PollTopUi _topUi;
         [SerializeField] private PollBottomBar _bottomBar;
         [SerializeField] private DrawingController _drawingController;
         [SerializeField] private RectTransform _pollResultsContainer;
@@ -45,6 +46,7 @@ namespace Screens
 
         private void Awake()
         {
+            // Initialize possible option positions
             _optionPositionsByOptionsCount = new();
             for (var i = 0; i < _pollOptionPositions.Length; i++) 
             {
@@ -56,23 +58,35 @@ namespace Screens
                 }
                 _optionPositionsByOptionsCount[optionsCount].Add(optionPosition);
             }
+
+            // Create button listeres
             _bottomBar.OnStartPollButtonClicked += StartPollButtonClickedCallback;
             _bottomBar.OnDrawingButtonClicked += DrawingButtonClickedCallback;
             _bottomBar.OnGalleryButtonClicked += GalleryButtonClickedCallback;
             _bottomBar.OnStickersButtonClicked += StickersButtonClickedCallback;
+            _resultsCallToAction.OnExitClicked += ExitPollClickedCallback;
+
+            // Clean up mock poll results
             var children = _pollResultsContainer.GetComponentsInChildren<PollOptionResultUi>();
             for (var i = 0; i < children.Length; i++)
             {
                 var child = children[i];
                 Destroy(child.gameObject);
             }
+
+            // Listen for relevant server responses
             FakeServerLink.Instance.OnPollResultsDataReceived += HandlePollResultsReceived;
         }
-        
+
+        private void OnDestroy()
+        {
+            FakeServerLink.Instance.OnPollResultsDataReceived -= HandlePollResultsReceived;
+        }
+
         private void Start()
         {
-            SetPollPhase(PollPhase.Spectate);
 #if UNITY_EDITOR
+            SetPollPhase(PollPhase.EditorOnlyWaitingForData);
             if (PollProperties == null)
             {
                 // Required only when running this scene directly
@@ -81,6 +95,7 @@ namespace Screens
                 return;
             }
 #endif
+            SetPollPhase(PollPhase.Spectate);
             DisplayPoll();
         }
 
@@ -91,6 +106,7 @@ namespace Screens
             {
                 yield return null;
             }
+            SetPollPhase(PollPhase.Spectate);
             DisplayPoll();
         }
 #endif
@@ -110,7 +126,12 @@ namespace Screens
         private void SetPollPhase(PollPhase pollPhase)
         {
             _pollPhase = pollPhase;
-            if (_pollPhase == PollPhase.Spectate)
+            if (_pollPhase == PollPhase.EditorOnlyWaitingForData)
+            {
+                _chatMessagesDisplayer.Deactivate();
+                _resultsCallToAction.Deactivate();
+            }
+            else if (_pollPhase == PollPhase.Spectate)
             {
                 _chatMessagesDisplayer.Activate();
                 _resultsCallToAction.Deactivate();
@@ -124,12 +145,11 @@ namespace Screens
             }
             _bottomBar.RefreshUi(_pollPhase);
             _bottomBar.RefreshDrawingButtonSprite(_isDrawingEnabled);
+            _topUi.UpdateUi(_pollPhase);
         }
 
         public void DisplayPoll()
         {
-            _pollQuestionText.text = PollProperties.Question;
-
             _pollOptionsUi = new();
             var optionsCount = PollProperties.OptionsData.Count;
             for (var i = 0; i < _optionPositionsByOptionsCount[optionsCount].Count; i++) 
@@ -147,7 +167,6 @@ namespace Screens
                 newOptionResultUi.OnClicked += OptionClickedCallback;
                 _pollOptionsUi.Add(newOptionResultUi);
             }
-            _countdownTimer.StartCountdown(PollProperties.SecondsLeft);
         }
 
         private void HandlePollResultsReceived()
@@ -202,6 +221,11 @@ namespace Screens
 
         private void OptionClickedCallback(int id)
         {
+            if (_pollPhase == PollPhase.Spectate)
+            {
+                _bottomBar.BounceStartPollButton();
+                return;
+            }
             if (_lastSelectedId != null)
             {
                 if (_lastSelectedId.Value == id)
@@ -239,6 +263,17 @@ namespace Screens
         private void StickersButtonClickedCallback()
         {
             SetIsDrawingEnabled(false);
+        }
+
+        private void ExitPollClickedCallback()
+        {
+            SetPollPhase(PollPhase.ExitingPoll);
+            FakeServerLink.Instance.SendRequestToServer(new ExitPollRequest(), HandleExitPollSuccess);
+        }
+
+        private void HandleExitPollSuccess(BaseServerResponse response)
+        {
+            ScenesManager.Instance.LoadScene(SceneName.Main);
         }
     }
 }

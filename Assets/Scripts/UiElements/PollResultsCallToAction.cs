@@ -1,5 +1,7 @@
+using Effects;
 using Infrastructure;
 using Polls;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -13,6 +15,8 @@ namespace UiElements
         [SerializeField] private TextMeshProUGUI _pollEndedTitleText;
         [SerializeField] private TextMeshProUGUI _pollEndedDescriptionText;
         [SerializeField] private Button _exitPollButton;
+        [SerializeField] private GenericUiElementAnimator _genericAnimator;
+        public Action OnExitClicked;
         private PollStore PollStore => ClientServices.Instance.PollStore;
 
         private void Awake()
@@ -22,9 +26,10 @@ namespace UiElements
 
         public void Activate()
         {
+            gameObject.SetActive(true);
             _pollEndedTitleText.text = PollStore.CurrentPollResults.CallToActionTitle;
             _pollEndedDescriptionText.text = PollStore.CurrentPollResults.CallToActionDescription;
-            gameObject.SetActive(true);
+            _genericAnimator.Bounce();
         }
 
         public void Deactivate()
@@ -34,7 +39,7 @@ namespace UiElements
 
         private void ExitButtonClickedCallback()
         {
-
+            OnExitClicked?.Invoke();
         }
     }
 }
