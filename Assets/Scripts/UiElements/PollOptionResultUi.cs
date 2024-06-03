@@ -1,5 +1,6 @@
 using Effects;
 using Infrastructure;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,15 +11,26 @@ namespace UiElements
 {
     public struct PollOptionResultData
     {
-        public float Ratio01;
+        /// <summary>
+        /// A value between 0-1 (1=100%), representing the voting score for this option.
+        /// </summary>
+        public float ResultRatio01;
         public List<string> VotersAvatarImageUrls;
         public bool IsWinningOption;
         public bool IsUserChoice;
         public string ImageUrl;
+        /// <summary>
+        /// The delta between the option's image to the result component's image.
+        /// This value is needed to animate the image in this component, from the option
+        /// component to the center of this component.
+        /// </summary>
         public Vector3 PositionDeltaToOptionImage;
         public Vector2 ImageOriginSize;
     }
 
+    /// <summary>
+    /// This component displays and animates a single poll result.
+    /// </summary>
     public class PollOptionResultUi : PooledObject
     {
         const float MAX_ANIMATION_TIME = 1f;
@@ -39,20 +51,27 @@ namespace UiElements
         [SerializeField] private Sprite _votersBarDefaultSprite;
         [SerializeField] private Sprite _votersBarUserChoiceSprite;
         [SerializeField] private float _initialVotersBarHeight = 300;
+        [Header("Add Avatar Image Button")]
+        [SerializeField] private Button _addAvatarImageButton;
+        [SerializeField] private GenericUiElementAnimator _addAvatarImageGenericAnimator;
 #if UNITY_EDITOR
         [Header("Unity Editor")]
         [SerializeField] private Canvas _canvasForGizmos;
 #endif
         public RectTransform RectTransform => _rootRectTransform;
+        public Action OnAddAvatarImageClicked;
         private Coroutine _animationCoroutine;
         private Vector3 _imageOriginPosition;
         private float _maxVotersBarHeightAddon;
 
         private void Awake()
         {
-            
+            _addAvatarImageButton.onClick.AddListener(AddAvatarImageClickedCallback);
         }
 
+        /// <summary>
+        /// Display and animate poll result.
+        /// </summary>
         public void DisplayResult(PollOptionResultData data)
         {
             // Calculating voting bar's max height based on the parent container position
@@ -78,13 +97,17 @@ namespace UiElements
                 var avatarImage = ObjectPool.Instance.Borrow(_voterAvatarImagePrefab, _voterAvatarsContainer).GetComponent<PollVoterAvatarImageUi>();
                 avatarImage.ShowImage(data.VotersAvatarImageUrls[i]);
             }
-            
-            _animationCoroutine = StartCoroutine(DisplayResultCoroutine(data.PositionDeltaToOptionImage, data.Ratio01));
+
+            _addAvatarImageButton.gameObject.SetActive(false);
+
+            _animationCoroutine = StartCoroutine(DisplayResultCoroutine(data.PositionDeltaToOptionImage, data.ResultRatio01,
+                activateAvatarImageButton: data.IsUserChoice));
             _mainImage.sprite = ClientServices.Instance.ImageStore.LoadImage(data.ImageUrl);
             _resultPercentText.text = "0%";
         }
 
-        private IEnumerator DisplayResultCoroutine(Vector3 positionDeltaToOptionImage, float ratio01)
+        private IEnumerator DisplayResultCoroutine(Vector3 positionDeltaToOptionImage, float ratio01, 
+            bool activateAvatarImageButton)
         {
             _imageOriginPosition = _mainImageContainer.position;
             positionDeltaToOptionImage.z = 0;
@@ -127,6 +150,13 @@ namespace UiElements
             }
             SetVotersBarHeight(_initialVotersBarHeight + targetVotersBarHeightAddon);
             _resultPercentText.text = $"{Mathf.RoundToInt(ratio01 * 100)}%";
+
+            if (activateAvatarImageButton)
+            {
+                _addAvatarImageButton.gameObject.SetActive(true);
+                _addAvatarImageButton.transform.localScale = Vector3.zero;
+                _addAvatarImageGenericAnimator.Bounce();
+            }
         }
 
         private void SetVotersBarHeight(float height)
@@ -152,20 +182,9 @@ namespace UiElements
             _mainImageGenericAnimator.ResetAll();
         }
 
-#if UNITY_EDITOR
-        private void OnDrawGizmos()
+        private void AddAvatarImageClickedCallback()
         {
-            if (_canvasForGizmos == null)
-            {
-                return;
-            }
-            Gizmos.color = Color.green;
-            var position = transform.position + Vector3.up * _initialVotersBarHeight * _canvasForGizmos.transform.localScale.y;
-            var cubeSize = new Vector3(10, 0.3f, 1);
-            Gizmos.DrawCube(position, cubeSize);
-            position += Vector3.up * _maxVotersBarHeightAddon * _canvasForGizmos.transform.localScale.y;
-            Gizmos.DrawCube(position, cubeSize);
+            OnAddAvatarImageClicked?.Invoke();
         }
-#endif
     }
 }

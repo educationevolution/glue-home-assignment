@@ -14,10 +14,19 @@ namespace ServerClientCommunication
         public string AvatarImageUrl;
     }
 
+    /// <summary>
+    /// This component simuulates the communication between the client and the server.
+    /// The client can send pre defined requests to the server, await for the server to send a response 
+    /// and handle the response accordingly.
+    /// The component also simulates server to client alerts for:
+    /// - Ending a poll
+    /// - Chat messages during a poll.
+    /// </summary>
     public class FakeServerLink : MonoBehaviour
     {
-        private const float CHAT_MESSAGE_MIN_DELAY = 0.1f;
-        private const float CHAT_MESSAGE_MAX_DELAY_ADDON = 0.1f;
+        private const float FAKE_SERVER_RESPONSE_DELAY = 0.3f;
+        private const float CHAT_MESSAGE_MIN_DELAY = 0.3f;
+        private const float CHAT_MESSAGE_MAX_DELAY_ADDON = 1.5f;
         public static FakeServerLink Instance { get; private set; }
         public Action<ServerChatMessageData> OnChatMessageDataReceived;
         public Action OnPollResultsDataReceived;
@@ -51,6 +60,11 @@ namespace ServerClientCommunication
             StartCoroutine(FakeChatMessagesCoroutine());
         }
 
+        /// <summary>
+        /// Send a request to the server.
+        /// </summary>
+        /// <param name="request">Uniqe client to server request</param>
+        /// <param name="responseHandler">Optional response handler for the server response</param>
         public void SendRequestToServer(BaseServerRequest request, Action<BaseServerResponse> responseHandler)
         {
             if (responseHandler != null)
@@ -66,8 +80,7 @@ namespace ServerClientCommunication
 
         private IEnumerator FakeRequestCoroutine(int id, BaseServerRequest request, Action<BaseServerResponse> responseHandler)
         {
-            var fakeServerResponseDelay = 0.2f;
-            yield return new WaitForSeconds(fakeServerResponseDelay);
+            yield return new WaitForSeconds(FAKE_SERVER_RESPONSE_DELAY);
 
             BaseServerResponse reponse = new EnterPollResponse(isSuccess: true);
 

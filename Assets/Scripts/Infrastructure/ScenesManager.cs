@@ -13,6 +13,9 @@ namespace Infrastructure
         Poll
     }
 
+    /// <summary>
+    /// A manager for switching between scenes.
+    /// </summary>
     public class ScenesManager : MonoBehaviour
     {
         [SerializeField] private int _defaultTargetFrameRate = 60;
@@ -35,6 +38,10 @@ namespace Infrastructure
             _currentScene = sceneName;
         }
 
+        /// <summary>
+        /// Load a new scene.
+        /// Also revert all borrowed instances back into the object pool.
+        /// </summary>
         public void LoadScene(SceneName sceneToLoad)
         {
             if (_currentScene == sceneToLoad)

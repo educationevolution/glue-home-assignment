@@ -21,19 +21,27 @@ namespace Screens
         ExitingPoll
     }
 
+    /// <summary>
+    /// Manages entire poll Ui flow and syncs between all relevant components.
+    /// </summary>
     public class PollScreenManager : MonoBehaviour
     {
-        [SerializeField] private PollOptionPosition[] _pollOptionPositions;
+        [Header("Poll Options")]
         [SerializeField] private RectTransform _pollOptionsContainer;
+        [SerializeField] private PollOptionPosition[] _pollOptionPositions;
+        [SerializeField] private PollOptionUi _pollOptionUiPrefab;
+
+        [Header("Poll Results")]
+        [SerializeField] private PollOptionResultUi _optionResultUiPrefab;
+        [SerializeField] private PollResultsCallToAction _resultsCallToAction;
+        [SerializeField] private RectTransform _pollResultsContainer;
+        
+        [Header("Misc")]
         [SerializeField] private PollTopUi _topUi;
         [SerializeField] private PollBottomBar _bottomBar;
         [SerializeField] private DrawingController _drawingController;
-        [SerializeField] private RectTransform _pollResultsContainer;
-        [SerializeField] private PollOptionUi _pollOptionUiPrefab;
-        [SerializeField] private PollOptionResultUi _optionResultUiPrefab;
         [SerializeField] private RectTransform _rootContainer;
         [SerializeField] private ChatMessagesDisplayer _chatMessagesDisplayer;
-        [SerializeField] private PollResultsCallToAction _resultsCallToAction;
         [SerializeField] private GalleryImagesController _galleryImagesController;
         [SerializeField] private StickersInventoryUi _stickersInventory;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
@@ -156,6 +164,9 @@ namespace Screens
 
         private PollPhase GetPollPhase() => _pollPhase;
 
+        /// <summary>
+        /// Displays a new poll once the data from the server is received.
+        /// </summary>
         public void DisplayPoll()
         {
             _pollOptionsUi = new();
@@ -214,9 +225,13 @@ namespace Screens
                 var isWinningOption = winningOptionIndex == i;
                 var newOptionResultUi = _pollOptionResultsUi[i];
                 var positionDeltaFromOptionToResult = optionUi.ImageRectPosition - newOptionResultUi.RectTransform.position;
+                if (isUserChoice)
+                {
+                    newOptionResultUi.OnAddAvatarImageClicked += AddAvatarImageClickedCallback;
+                }
                 var uiData = new PollOptionResultData()
                 {
-                    Ratio01 = resultData.Result01,
+                    ResultRatio01 = resultData.Result01,
                     IsUserChoice = isUserChoice,
                     IsWinningOption = isWinningOption,
                     ImageUrl = optionData.ImageUrl,
@@ -249,6 +264,11 @@ namespace Screens
             }
             _lastSelectedId = id;
             _pollOptionsUi[_lastSelectedId.Value].SetIsSelected(true);
+        }
+
+        private void AddAvatarImageClickedCallback()
+        {
+            var imageUrl = PollProperties.OptionsData[_lastSelectedId.Value].ImageUrl;
         }
 
         private void StartPollButtonClickedCallback()
