@@ -65,6 +65,10 @@ namespace UiElements
                 var container = _nonSelectedContainers[i];
                 container.gameObject.SetActive(!isSelected);
             }
+            if (isSelected)
+            {
+                _genericAnimator.Bounce(0.3f);
+            }
         }
 
         private void ButtonClickedCallback()

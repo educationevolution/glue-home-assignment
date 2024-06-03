@@ -984,23 +984,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26d0f7c469e09eb41920b4ccb4802ee5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _alphaOutCurve:
+  _canvasGroupTransparency: {fileID: 4190253010897635178}
+  _bounceAnimationCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.0017738342
-      value: 1.0037842
-      inSlope: -1.0178771
-      outSlope: -1.0178771
+      time: 0
+      value: 1.0031738
+      inSlope: 1.4619762
+      outSlope: 1.4619762
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.98931885
-      value: -0.0014152527
-      inSlope: -1.0178771
-      outSlope: -1.0178771
+      time: 0.210892
+      value: 1.3114929
+      inSlope: 0.38960546
+      outSlope: 0.38960546
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.86318004
+      value: 0.86613333
+      inSlope: 0.14782476
+      outSlope: 0.14782476
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.9784148
+      outSlope: 0.9784148
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -1008,7 +1027,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _canvasGroupTransparency: {fileID: 4190253010897635178}
 --- !u!225 &4190253010897635178
 CanvasGroup:
   m_ObjectHideFlags: 0

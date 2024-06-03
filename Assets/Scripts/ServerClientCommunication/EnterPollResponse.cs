@@ -21,7 +21,7 @@ namespace ServerClientCommunication
     public class EnterPollResponse : BaseServerResponse
     {
         public EnterPollResponseData Data;
-        private static int _lastOptionsCount = 2;
+        private static int _lastOptionsCount = 3;
 
         public EnterPollResponse(bool isSuccess) : base(isSuccess)
         {

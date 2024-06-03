@@ -224,12 +224,16 @@ namespace Screens
                 newOptionResultUi.DisplayResult(uiData);
             }
         }
-
+        
         private void OptionClickedCallback(int id)
         {
             if (_pollPhase == PollPhase.Spectate)
             {
                 _bottomBar.BounceStartPollButton();
+                return;
+            }
+            if (_drawingController.IsEnabled)
+            {
                 return;
             }
             if (_lastSelectedId != null)

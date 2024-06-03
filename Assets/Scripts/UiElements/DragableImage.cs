@@ -1,27 +1,47 @@
 using Effects;
 using Infrastructure;
+using ServerClientCommunication;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace UiElements
 {
-    public class DragableImage : PooledObject
+    public class DragableImage : PooledObject, IPointerDownHandler, IPointerUpHandler
     {
         [SerializeField] private RectTransform _rootRectTrans;
         [SerializeField] private Image _image;
         [SerializeField] private GenericUiElementAnimator _genericAnimator;
+        [SerializeField] private Image[] _frameImageAssets;
         private bool _isManualDragActive;
 
-        private void Awake()
+        public void ShowImage(Texture2D texture, bool showFrame = true, bool bounce = true)
         {
-            //_button.OnPointerDown += ButtonMouseDownCallback;
+            var rect = new Rect(0, 0, texture.width, texture.height);
+            var sprite = Sprite.Create(texture, rect, pivot: Vector2.zero, pixelsPerUnit: 100f);
+            ShowImageInternal(sprite, showFrame, bounce);
         }
 
-        private void OnMouseDrag()
+        public void ShowImage(string imageUrl, bool showFrame, bool bounce)
         {
-            SetAtMousePosition();
+            var sprite = ClientServices.Instance.ImageStore.LoadImage(imageUrl);
+            ShowImageInternal(sprite, showFrame, bounce);
+        }
+
+        private void ShowImageInternal(Sprite sprite, bool showFrame, bool bounce)
+        {
+            _image.sprite = sprite;
+            if (bounce)
+            {
+                const float BOUNCE_DURATION = 0.2f;
+                _genericAnimator.Bounce(BOUNCE_DURATION);
+            }
+            for (var i = 0; i < _frameImageAssets.Length; i++)
+            {
+                _frameImageAssets[i].gameObject.SetActive(showFrame);
+            }
         }
 
         private void Update()
@@ -30,13 +50,21 @@ namespace UiElements
             {
                 return;
             }
-            if (Input.GetMouseButtonUp(0))
-            {
-                _isManualDragActive = false;
-            } else
+            if (IsBeingTouched())
             {
                 SetAtMousePosition();
+            } else
+            {
+                _isManualDragActive = false;
             }
+        }
+
+        private bool IsBeingTouched()
+        {
+#if UNITY_EDITOR
+            return Input.GetMouseButtonUp(0) == false;
+#endif
+            return Input.touchCount > 0;
         }
 
         public void StartManualDrag()
@@ -47,34 +75,17 @@ namespace UiElements
 
         private void SetAtMousePosition()
         {
-            var newPosition = Input.mousePosition;
+            Vector3 newPosition;
+#if UNITY_EDITOR
+            newPosition = Input.mousePosition;
+#else
+            var touchPosition = Input.touches[0].position;
+            newPosition = new Vector3(touchPosition.x, touchPosition.y, 0);
+#endif
             newPosition.z = _rootRectTrans.position.z;
             newPosition.x -= Screen.width / 2;
             newPosition.y -= Screen.height / 2;
             _rootRectTrans.anchoredPosition = newPosition;
-        }
-
-        public void ShowImage(Texture2D texture)
-        {
-            var rect = new Rect(0, 0, texture.width, texture.height);
-            var sprite = Sprite.Create(texture, rect, pivot: Vector2.zero, pixelsPerUnit: 100f);
-            ShowImageInternal(sprite);
-        }
-
-        public void ShowImage(string imageUrl, bool bounce)
-        {
-            var sprite = ClientServices.Instance.ImageStore.LoadImage(imageUrl);
-            ShowImageInternal(sprite, bounce);
-        }
-
-        private void ShowImageInternal(Sprite sprite, bool bounce = true)
-        {
-            _image.sprite = sprite;
-            if (bounce)
-            {
-                const float BOUNCE_DURATION = 0.2f;
-                _genericAnimator.Bounce(BOUNCE_DURATION);
-            }
         }
 
         public void AnimateToFullTransparency()
@@ -90,6 +101,16 @@ namespace UiElements
         public override void HandlePreRevertToPool()
         {
             _genericAnimator.ResetAll();
+            _isManualDragActive = false;
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            _isManualDragActive = true;
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
             _isManualDragActive = false;
         }
     }

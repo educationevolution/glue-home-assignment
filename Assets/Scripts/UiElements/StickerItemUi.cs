@@ -4,25 +4,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace UiElements
 {
-    public class StickerItemUi : PooledObject
+    public class StickerItemUi : PooledObject, IPointerDownHandler
     {
         [SerializeField] private Image _stickerImage;
-        public Action<int> OnItemMouseDown;
+        public Action<int> OnPointerIsDown;
         private int _id;
 
         public void Initialize(int id, UserStickerData data)
         {
             _id = id;
             _stickerImage.sprite = ClientServices.Instance.ImageStore.LoadImage(data.ImageUrl);
-        }
-
-        private void OnMouseDown()
-        {
-            OnItemMouseDown?.Invoke(_id);
         }
 
         public override void HandlePostBorrowFromPool()
@@ -33,6 +29,11 @@ namespace UiElements
         public override void HandlePreRevertToPool()
         {
             
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            OnPointerIsDown?.Invoke(_id);
         }
     }
 }

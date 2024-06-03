@@ -90,6 +90,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cccdbf5e59552342a8b8becce205701, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rootRectTrans: {fileID: 9127391792939960045}
+  _image: {fileID: 9127391792939960044}
+  _genericAnimator: {fileID: 0}
   _stickerImage: {fileID: 9127391792939960044}
 --- !u!61 &9127391792939960046
 BoxCollider2D:

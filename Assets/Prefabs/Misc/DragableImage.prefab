@@ -61,6 +61,9 @@ MonoBehaviour:
   _rootRectTrans: {fileID: 7680849371697461617}
   _image: {fileID: 7680849371748698078}
   _genericAnimator: {fileID: 3694391600736514615}
+  _frameImageAssets:
+  - {fileID: 7680849372680124267}
+  - {fileID: 7680849373393430993}
 --- !u!114 &7680849371697461620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,7 +267,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 0}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1

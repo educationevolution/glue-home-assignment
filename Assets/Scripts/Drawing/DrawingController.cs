@@ -12,7 +12,7 @@ namespace Infrastructure
         [SerializeField] private Transform _linesContainer;
         [SerializeField] private RectTransform _drawingBounds;
         private List<DrawingLine> _drawingLines = new();
-        private bool _isEnabled = false;
+        public bool IsEnabled { get; private set; } = false;
         private bool _isButtonDown = false;
         private Rect _drawingBoundsRect;
 
@@ -31,8 +31,8 @@ namespace Infrastructure
 
         public void SetIsEnabled(bool isEnabled)
         {
-            _isEnabled = isEnabled;
-            if (_isEnabled == false)
+            IsEnabled = isEnabled;
+            if (IsEnabled == false)
             {
                 _isButtonDown = false;
             }
@@ -49,7 +49,7 @@ namespace Infrastructure
 
         private void Update()
         {
-            if (_isEnabled == false)
+            if (IsEnabled == false)
             {
                 return;
             }

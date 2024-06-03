@@ -33,13 +33,16 @@ namespace UiElements
         private void Start()
         {
             Deactivate(isImmediate: true);
+
             var userStickersData = ClientServices.Instance.StickersStore.GetAllUserStickersData;
+            var allStickerItems = new List<StickerItemUi>();
             foreach (var stickerId in userStickersData.Keys)
             {
                 var stickerData = userStickersData[stickerId];
                 var stickerItem = ObjectPool.Instance.Borrow(_stickerItemPrefab, _stickerItemsContainer).GetComponent<StickerItemUi>();
                 stickerItem.Initialize(stickerId, stickerData);
-                stickerItem.OnItemMouseDown += StickerItemMouseDownCallback;
+                stickerItem.OnPointerIsDown += StickerItemMouseDownCallback;
+                allStickerItems.Add(stickerItem);
             }
         }
 
@@ -54,9 +57,10 @@ namespace UiElements
 
         private void StickerItemMouseDownCallback(int id)
         {
+            //return;
             var stickerData = ClientServices.Instance.StickersStore.GetUserStickerData(id);
             var dragableSticker = ObjectPool.Instance.Borrow(_dragableStickerPrefab, _dragableStickersContainer).GetComponent<DragableImage>();
-            dragableSticker.ShowImage(stickerData.ImageUrl, bounce: false);
+            dragableSticker.ShowImage(stickerData.ImageUrl, showFrame: false, bounce: false);
             dragableSticker.StartManualDrag();
             _dragableStickers.Add(dragableSticker);
         }
