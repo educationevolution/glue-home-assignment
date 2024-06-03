@@ -14,10 +14,10 @@ namespace UiElements
         [SerializeField] private GenericUiElementAnimator _genericAnimator;
         [SerializeField] private Button _closeButton;
         [SerializeField] private StickerItemUi _stickerItemPrefab;
-        [SerializeField] private DragableImage _dragableStickerPrefab;
+        [SerializeField] private DraggableImage _dragableStickerPrefab;
         [SerializeField] private RectTransform _stickerItemsContainer;
         [SerializeField] private RectTransform _dragableStickersContainer;
-        private List<DragableImage> _dragableStickers = new();
+        private List<DraggableImage> _dragableStickers = new();
 
         private void Awake()
         {
@@ -59,7 +59,7 @@ namespace UiElements
         {
             //return;
             var stickerData = ClientServices.Instance.StickersStore.GetUserStickerData(id);
-            var dragableSticker = ObjectPool.Instance.Borrow(_dragableStickerPrefab, _dragableStickersContainer).GetComponent<DragableImage>();
+            var dragableSticker = ObjectPool.Instance.Borrow(_dragableStickerPrefab, _dragableStickersContainer).GetComponent<DraggableImage>();
             dragableSticker.ShowImage(stickerData.ImageUrl, showFrame: false, bounce: false);
             dragableSticker.StartManualDrag();
             _dragableStickers.Add(dragableSticker);

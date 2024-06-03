@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 8525570472354687886}
   - component: {fileID: 2089386107886982079}
   - component: {fileID: 5625058459303174160}
+  - component: {fileID: 9175523059471592883}
   m_Layer: 5
   m_Name: ChatDefaultMessageUi
   m_TagString: Untagged
@@ -153,6 +154,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _messageText: {fileID: 1937814175182735230}
   _avatarImage: {fileID: 7174075372506763533}
+  _canvasGroup: {fileID: 9175523059471592883}
+  _rectTransform: {fileID: 8525570472354687886}
+--- !u!225 &9175523059471592883
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4294153536295460109}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &5626459643679175200
 GameObject:
   m_ObjectHideFlags: 0

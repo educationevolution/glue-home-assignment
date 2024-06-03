@@ -5,9 +5,14 @@ using UnityEngine;
 
 namespace ServerClientCommunication
 {
+    public class PollSingleResultData
+    {
+        public float Result01;
+        public List<string> VotersAvatarImageUrls;
+    }
     public class PollResultsResponseData
     {
-        public List<float> Results01;
+        public List<PollSingleResultData> ResultsData;
         public string CallToActionTitle;
         public string CallToActionDescription;
     }
@@ -20,13 +25,19 @@ namespace ServerClientCommunication
         public PollResultsResponse(bool isSuccess) : base(isSuccess)
         {
             var totalOptions = PollProperties.OptionsData.Count;
-            var results01 = new List<float>();
+            var resultsData = new List<PollSingleResultData>();
+            var resultsLeft01 = 1f;
             var highestResultIndex = 0;
             var highestResult01 = 0f;
             for (var i = 0; i < totalOptions; i++) 
             {
-                var newResult01 = Random.Range(0, 1f);
-                results01.Add(newResult01);
+                var singleResultData = new PollSingleResultData();
+                var newResult01 = i == totalOptions - 1?
+                    resultsLeft01 : Random.Range(0, resultsLeft01);
+                singleResultData.Result01 = newResult01;
+                singleResultData.VotersAvatarImageUrls = GetVotersAvatarImageUrls();
+                resultsLeft01 -= newResult01;
+                resultsData.Add(singleResultData);
                 if (highestResult01 > newResult01)
                 {
                     highestResult01 = newResult01;
@@ -36,10 +47,21 @@ namespace ServerClientCommunication
             var winningOptionData = PollProperties.OptionsData[highestResultIndex];
             Data = new PollResultsResponseData()
             {
-                Results01 = results01,
+                ResultsData = resultsData,
                 CallToActionTitle = $"Team {winningOptionData.Title},",
                 CallToActionDescription = "Let's see how much you know about her"
             };
+        }
+
+        private List<string> GetVotersAvatarImageUrls()
+        {
+            var votersCount = Random.Range(3, 8);
+            var returnList = new List<string>();
+            for (var i = 0; i < votersCount; i++) 
+            {
+                returnList.Add($"Images/userAvatar{UnityEngine.Random.Range(1, 5)}");
+            }
+            return returnList;
         }
     }
 }

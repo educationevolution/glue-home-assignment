@@ -16,6 +16,8 @@ namespace ServerClientCommunication
 
     public class FakeServerLink : MonoBehaviour
     {
+        private const float CHAT_MESSAGE_MIN_DELAY = 0.1f;
+        private const float CHAT_MESSAGE_MAX_DELAY_ADDON = 0.1f;
         public static FakeServerLink Instance { get; private set; }
         public Action<ServerChatMessageData> OnChatMessageDataReceived;
         public Action OnPollResultsDataReceived;
@@ -105,12 +107,13 @@ namespace ServerClientCommunication
             ClientServices.Instance.PollStore.SetCurrentPollResults(pollResultsReponse.Data);
             OnPollResultsDataReceived?.Invoke();
         }
-
+        
         private IEnumerator FakeChatMessagesCoroutine()
         {
             while (true)
             {
-                yield return new WaitForSeconds(UnityEngine.Random.Range(0.2f, 3f));
+                var delayToNextMessage = UnityEngine.Random.Range(CHAT_MESSAGE_MIN_DELAY, CHAT_MESSAGE_MAX_DELAY_ADDON);
+                yield return new WaitForSeconds(delayToNextMessage);
                 var randomUserId = ClientServices.Instance.FakeUserId + UnityEngine.Random.Range(1, 100);
                 CreateChatMessage(new ServerChatMessageData()
                 {

@@ -65,7 +65,6 @@ GameObject:
   - component: {fileID: 7727378016355996895}
   - component: {fileID: 7727378016355996883}
   - component: {fileID: 7727378016355996893}
-  - component: {fileID: 7727378016355996880}
   m_Layer: 5
   m_Name: MessagesContainer
   m_TagString: Untagged
@@ -137,20 +136,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7727378016355996894}
   m_CullTransparentMesh: 1
---- !u!114 &7727378016355996880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7727378016355996894}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding: {x: 0, y: -300, z: 0, w: 0}
-  m_Softness: {x: 0, y: 737}
 --- !u!1001 &554694241576505854
 PrefabInstance:
   m_ObjectHideFlags: 0

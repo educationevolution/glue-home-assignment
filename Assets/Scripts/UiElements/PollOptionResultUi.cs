@@ -11,6 +11,7 @@ namespace UiElements
     public struct PollOptionResultData
     {
         public float Ratio01;
+        public List<string> VotersAvatarImageUrls;
         public bool IsWinningOption;
         public bool IsUserChoice;
         public string ImageUrl;
@@ -27,6 +28,7 @@ namespace UiElements
         [SerializeField] private TextMeshProUGUI _yourChoiceText;
         [SerializeField] private RectTransform _voterAvatarsContainer;
         [SerializeField] private RectTransform _winningChoiceEffectsContainer;
+        [SerializeField] private PollVoterAvatarImageUi _voterAvatarImagePrefab;
         [Header("Main Image")]
         [SerializeField] private RectTransform _mainImageContainer;
         [SerializeField] private Image _mainImage;
@@ -62,8 +64,21 @@ namespace UiElements
                 const float WINNING_OPTION_SCALE = 1.3f;
                 _mainImageGenericAnimator.AnimateToNewScale(WINNING_OPTION_SCALE);
             }
+
+            var children = _voterAvatarsContainer.GetComponentsInChildren<PollVoterAvatarImageUi>();
+            for (var i = 0; i < children.Length; i++)
+            {
+                Destroy(children[i].gameObject);
+            }
+            for (var i = 0; i < data.VotersAvatarImageUrls.Count; i++)
+            {
+                var avatarImage = ObjectPool.Instance.Borrow(_voterAvatarImagePrefab, _voterAvatarsContainer).GetComponent<PollVoterAvatarImageUi>();
+                avatarImage.ShowImage(data.VotersAvatarImageUrls[i]);
+            }
+
             _animationCoroutine = StartCoroutine(DisplayResultCoroutine(data.PositionDeltaToOptionImage, data.Ratio01));
             _mainImage.sprite = ClientServices.Instance.ImageStore.LoadImage(data.ImageUrl);
+            _resultPercentText.text = "0%";
         }
 
         private IEnumerator DisplayResultCoroutine(Vector3 positionDeltaToOptionImage, float ratio01)
@@ -108,7 +123,7 @@ namespace UiElements
                 yield return null;
             }
             SetVotersBarHeight(_initialVotersBarHeight + targetVotersBarHeightAddon);
-            _resultPercentText.text = $"{Mathf.CeilToInt(ratio01 * 100)}%";
+            _resultPercentText.text = $"{Mathf.RoundToInt(ratio01 * 100)}%";
         }
 
         private void SetVotersBarHeight(float height)

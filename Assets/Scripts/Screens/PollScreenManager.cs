@@ -7,7 +7,7 @@ using UnityEngine;
 using Infrastructure;
 using UnityEngine.UI;
 using Chat;
-using DragableImages;
+using DraggableImages;
 
 namespace Screens
 {
@@ -146,6 +146,7 @@ namespace Screens
                 _resultsCallToAction.Activate();
                 _galleryImagesController.HideAll();
                 _stickersInventory.HideAll();
+                _stickersInventory.Deactivate();
             }
             _bottomBar.RefreshUi(_pollPhase);
             _bottomBar.RefreshDrawingButtonSprite(_isDrawingEnabled);
@@ -180,12 +181,12 @@ namespace Screens
             SetPollPhase(PollPhase.Results);
             var winningOptionIndex = 0;
             var highestResult01 = 0f;
-            for (var i = 0; i < PollResults.Results01.Count; i++)
+            for (var i = 0; i < PollResults.ResultsData.Count; i++)
             {
-                var result01 = PollResults.Results01[i];
-                if (highestResult01 < result01)
+                var resultData = PollResults.ResultsData[i];
+                if (highestResult01 < resultData.Result01)
                 {
-                    highestResult01 = result01;
+                    highestResult01 = resultData.Result01;
                     winningOptionIndex = i;
                 }
             }
@@ -206,7 +207,7 @@ namespace Screens
                 var optionUi = _pollOptionsUi[i];
                 optionUi.AnimateToFullTransparency();
                 var optionData = PollProperties.OptionsData[i];
-                var result01 = PollResults.Results01[i];
+                var resultData = PollResults.ResultsData[i];
                 var isUserChoice = _lastSelectedId == null ?
                     false : _lastSelectedId.Value == i;
                 var isWinningOption = winningOptionIndex == i;
@@ -214,12 +215,13 @@ namespace Screens
                 var positionDeltaFromOptionToResult = optionUi.ImageRectPosition - newOptionResultUi.RectTransform.position;
                 var uiData = new PollOptionResultData()
                 {
-                    Ratio01 = result01,
+                    Ratio01 = resultData.Result01,
                     IsUserChoice = isUserChoice,
                     IsWinningOption = isWinningOption,
                     ImageUrl = optionData.ImageUrl,
                     PositionDeltaToOptionImage = positionDeltaFromOptionToResult,
-                    ImageOriginSize = optionUi.ImageSize
+                    ImageOriginSize = optionUi.ImageSize,
+                    VotersAvatarImageUrls = resultData.VotersAvatarImageUrls
                 };
                 newOptionResultUi.DisplayResult(uiData);
             }

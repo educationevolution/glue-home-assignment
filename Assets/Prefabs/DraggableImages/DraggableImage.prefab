@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 3694391600736514615}
   - component: {fileID: 5588123118379675962}
   m_Layer: 5
-  m_Name: DragableImage
+  m_Name: DraggableImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

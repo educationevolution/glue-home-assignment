@@ -11,6 +11,10 @@ namespace UiElements
     {
         [SerializeField] private TextMeshProUGUI _messageText;
         [SerializeField] private Image _avatarImage;
+        [SerializeField] private CanvasGroup _canvasGroup;
+        [SerializeField] private RectTransform _rectTransform;
+
+        public RectTransform RectTransform => _rectTransform;
 
         public void Initialize(string text, string avatarImageUrl)
         {
@@ -18,9 +22,14 @@ namespace UiElements
             _messageText.text = text;
         }
 
+        public void SetAlpha(float alpha)
+        {
+            _canvasGroup.alpha = alpha;
+        }
+
         public override void HandlePostBorrowFromPool()
         {
-            
+            SetAlpha(1);
         }
 
         public override void HandlePreRevertToPool()

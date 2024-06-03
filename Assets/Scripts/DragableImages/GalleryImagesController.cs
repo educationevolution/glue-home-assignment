@@ -6,15 +6,15 @@ using System.Collections.Generic;
 using UiElements;
 using UnityEngine;
 
-namespace DragableImages
+namespace DraggableImages
 {
     public class GalleryImagesController : MonoBehaviour
     {
-        [SerializeField] private DragableImage _dragableImagePrefab;
+        [SerializeField] private DraggableImage _draggableImagePrefab;
         [SerializeField] private RectTransform _galleryImageContainer;
         [SerializeField] private RectTransform _galleryImageCreationPosition;
         private Func<PollPhase> _getPollPhaseFunc;
-        private List<DragableImage> _dragableImages = new();
+        private List<DraggableImage> _draggableImages = new();
 
         public void Initialize(Func<PollPhase> getPollPhaseFunc)
         {
@@ -40,10 +40,10 @@ namespace DragableImages
                 {
                     return;
                 }
-                var newGalleryImage = ObjectPool.Instance.Borrow(_dragableImagePrefab, _galleryImageContainer).GetComponent<DragableImage>();
+                var newGalleryImage = ObjectPool.Instance.Borrow(_draggableImagePrefab, _galleryImageContainer).GetComponent<DraggableImage>();
                 newGalleryImage.transform.position = _galleryImageCreationPosition.transform.position;
                 newGalleryImage.ShowImage(texturre);
-                _dragableImages.Add(newGalleryImage);
+                _draggableImages.Add(newGalleryImage);
             } catch
             {
                 Debug.LogError("Failed loading image from Gallery!");
@@ -52,10 +52,10 @@ namespace DragableImages
 
         public void HideAll()
         {
-            for (var i = 0; i < _dragableImages.Count; i++)
+            for (var i = 0; i < _draggableImages.Count; i++)
             {
-                var dragableImage = _dragableImages[i];
-                dragableImage.AnimateToFullTransparency();
+                var draggableImage = _draggableImages[i];
+                draggableImage.AnimateToFullTransparency();
             }
         }
     }

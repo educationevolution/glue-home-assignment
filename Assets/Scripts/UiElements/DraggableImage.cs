@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace UiElements
 {
-    public class DragableImage : PooledObject, IPointerDownHandler, IPointerUpHandler
+    public class DraggableImage : PooledObject, IPointerDownHandler, IPointerUpHandler
     {
         [SerializeField] private RectTransform _rootRectTrans;
         [SerializeField] private Image _image;
