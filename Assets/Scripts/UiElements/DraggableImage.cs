@@ -16,22 +16,24 @@ namespace UiElements
         [SerializeField] private GenericUiElementAnimator _genericAnimator;
         [SerializeField] private Image[] _frameImageAssets;
         private bool _isManualDragActive;
+        private float _canvasScaleFactor;
 
-        public void ShowImage(Texture2D texture, bool showFrame = true, bool bounce = true)
+        public void ShowImage(Texture2D texture, float canvasScaleFactor, bool showFrame = true, bool bounce = true)
         {
             var rect = new Rect(0, 0, texture.width, texture.height);
             var sprite = Sprite.Create(texture, rect, pivot: Vector2.zero, pixelsPerUnit: 100f);
-            ShowImageInternal(sprite, showFrame, bounce);
+            ShowImageInternal(sprite, canvasScaleFactor, showFrame, bounce);
         }
 
-        public void ShowImage(string imageUrl, bool showFrame, bool bounce)
+        public void ShowImage(string imageUrl, float canvasScaleFactor, bool showFrame, bool bounce)
         {
             var sprite = ClientServices.Instance.ImageStore.LoadImage(imageUrl);
-            ShowImageInternal(sprite, showFrame, bounce);
+            ShowImageInternal(sprite, canvasScaleFactor, showFrame, bounce);
         }
 
-        private void ShowImageInternal(Sprite sprite, bool showFrame, bool bounce)
+        private void ShowImageInternal(Sprite sprite, float canvasScaleFactor, bool showFrame, bool bounce)
         {
+            _canvasScaleFactor = canvasScaleFactor;
             _image.sprite = sprite;
             if (bounce)
             {
@@ -83,8 +85,8 @@ namespace UiElements
             newPosition = new Vector3(touchPosition.x, touchPosition.y, 0);
 #endif
             newPosition.z = _rootRectTrans.position.z;
-            newPosition.x -= Screen.width / 2;
-            newPosition.y -= Screen.height / 2;
+            newPosition.x = (newPosition.x - Screen.width / 2) / _canvasScaleFactor;
+            newPosition.y = (newPosition.y - Screen.height / 2) / _canvasScaleFactor;
             _rootRectTrans.anchoredPosition = newPosition;
         }
 

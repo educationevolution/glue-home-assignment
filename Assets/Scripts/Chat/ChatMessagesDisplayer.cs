@@ -34,7 +34,6 @@ namespace Chat
             }
             var rectTransform = GetComponent<RectTransform>();
             _maxDisplayedMessages = Mathf.FloorToInt(rectTransform.rect.height / _defaultMessageUiPrefab.RectTransform.rect.height);
-            Debug.LogError(">>>>>>>>>>>>>> " + _defaultMessageUiPrefab.RectTransform.rect.height + "   " + rectTransform.rect.height);
         }
 
         public void Activate()

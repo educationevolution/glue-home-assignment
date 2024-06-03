@@ -13,6 +13,7 @@ namespace DraggableImages
         [SerializeField] private DraggableImage _draggableImagePrefab;
         [SerializeField] private RectTransform _galleryImageContainer;
         [SerializeField] private RectTransform _galleryImageCreationPosition;
+        [SerializeField] private Canvas _mainCanvas;
         private Func<PollPhase> _getPollPhaseFunc;
         private List<DraggableImage> _draggableImages = new();
 
@@ -42,7 +43,7 @@ namespace DraggableImages
                 }
                 var newGalleryImage = ObjectPool.Instance.Borrow(_draggableImagePrefab, _galleryImageContainer).GetComponent<DraggableImage>();
                 newGalleryImage.transform.position = _galleryImageCreationPosition.transform.position;
-                newGalleryImage.ShowImage(texturre);
+                newGalleryImage.ShowImage(texturre, _mainCanvas.scaleFactor);
                 _draggableImages.Add(newGalleryImage);
             } catch
             {

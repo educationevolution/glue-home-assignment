@@ -2318,6 +2318,7 @@ MonoBehaviour:
   _draggableImagePrefab: {fileID: 7680849371697461621, guid: 1d2617df0f87f5440aaf09a25778b5ea, type: 3}
   _galleryImageContainer: {fileID: 1626353861}
   _galleryImageCreationPosition: {fileID: 1326407168}
+  _mainCanvas: {fileID: 870097885}
 --- !u!114 &1026226884 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7990709657340929830, guid: c29de2e1de2b1cf49855e9b961406765, type: 3}
@@ -4835,6 +4836,7 @@ MonoBehaviour:
   _dragableStickerPrefab: {fileID: 7680849371697461621, guid: 1d2617df0f87f5440aaf09a25778b5ea, type: 3}
   _stickerItemsContainer: {fileID: 660299272}
   _dragableStickersContainer: {fileID: 1626353861}
+  _mainCanvas: {fileID: 870097885}
 --- !u!1001 &1678181141
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5620,6 +5622,14 @@ PrefabInstance:
     - target: {fileID: 8651059160066846725, guid: 569c7f09280995743934a4815ac1fc61, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651059160812680982, guid: 569c7f09280995743934a4815ac1fc61, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 106.44998
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651059161694328062, guid: 569c7f09280995743934a4815ac1fc61, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -100.69998
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
