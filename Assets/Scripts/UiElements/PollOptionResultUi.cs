@@ -39,7 +39,6 @@ namespace UiElements
         [SerializeField] private Sprite _votersBarDefaultSprite;
         [SerializeField] private Sprite _votersBarUserChoiceSprite;
         [SerializeField] private float _initialVotersBarHeight = 300;
-        [SerializeField] private float _maxVotersBarHeightAddon = 150;
 #if UNITY_EDITOR
         [Header("Unity Editor")]
         [SerializeField] private Canvas _canvasForGizmos;
@@ -47,6 +46,7 @@ namespace UiElements
         public RectTransform RectTransform => _rootRectTransform;
         private Coroutine _animationCoroutine;
         private Vector3 _imageOriginPosition;
+        private float _maxVotersBarHeightAddon;
 
         private void Awake()
         {
@@ -55,6 +55,9 @@ namespace UiElements
 
         public void DisplayResult(PollOptionResultData data)
         {
+            // Calculating voting bar's max height based on the parent container position
+            _maxVotersBarHeightAddon = _rootRectTransform.anchoredPosition.y * -1 - _initialVotersBarHeight;
+
             _winningChoiceEffectsContainer.gameObject.SetActive(data.IsWinningOption);
             _yourChoiceText.gameObject.SetActive(data.IsUserChoice);
             _votersBarImage.sprite = data.IsUserChoice ?
@@ -75,7 +78,7 @@ namespace UiElements
                 var avatarImage = ObjectPool.Instance.Borrow(_voterAvatarImagePrefab, _voterAvatarsContainer).GetComponent<PollVoterAvatarImageUi>();
                 avatarImage.ShowImage(data.VotersAvatarImageUrls[i]);
             }
-
+            
             _animationCoroutine = StartCoroutine(DisplayResultCoroutine(data.PositionDeltaToOptionImage, data.Ratio01));
             _mainImage.sprite = ClientServices.Instance.ImageStore.LoadImage(data.ImageUrl);
             _resultPercentText.text = "0%";

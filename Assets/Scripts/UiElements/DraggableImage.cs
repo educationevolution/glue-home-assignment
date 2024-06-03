@@ -9,6 +9,9 @@ using UnityEngine.UI;
 
 namespace UiElements
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class DraggableImage : PooledObject, IPointerDownHandler, IPointerUpHandler
     {
         [SerializeField] private RectTransform _rootRectTrans;

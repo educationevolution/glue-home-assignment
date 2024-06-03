@@ -8,6 +8,11 @@ using UnityEngine;
 
 namespace Chat
 {
+    /// <summary>
+    /// Listens to chat messages responses from the fake server link.
+    /// Displays up to X messages.
+    /// Recycles old messages' instances.
+    /// </summary>
     public class ChatMessagesDisplayer : MonoBehaviour
     {
         [SerializeField] private ChatMessageUi _defaultMessageUiPrefab;
@@ -32,10 +37,12 @@ namespace Chat
                     Destroy(message.gameObject);
                 }
             }
-            var rectTransform = GetComponent<RectTransform>();
-            _maxDisplayedMessages = Mathf.FloorToInt(rectTransform.rect.height / _defaultMessageUiPrefab.RectTransform.rect.height);
+            _maxDisplayedMessages = Mathf.FloorToInt(_messagesContainer.rect.height / _defaultMessageUiPrefab.RectTransform.rect.height);
         }
 
+        /// <summary>
+        /// Start displaying chat messages.
+        /// </summary>
         public void Activate()
         {
             if (_isActive)
@@ -47,6 +54,9 @@ namespace Chat
             _messagesContainer.gameObject.SetActive(true);
         }
 
+        /// <summary>
+        /// Stop displaying chat messages and hide existing messages.
+        /// </summary>
         public void Deactivate()
         {
             if (_isActive == false)

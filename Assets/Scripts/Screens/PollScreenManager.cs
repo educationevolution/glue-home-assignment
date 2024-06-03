@@ -75,6 +75,7 @@ namespace Screens
                 Destroy(child.gameObject);
             }
 
+            _stickersInventory.gameObject.SetActive(true);
             _galleryImagesController.Initialize(GetPollPhase);
         }
 

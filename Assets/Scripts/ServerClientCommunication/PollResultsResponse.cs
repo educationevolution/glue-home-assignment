@@ -59,7 +59,7 @@ namespace ServerClientCommunication
             var returnList = new List<string>();
             for (var i = 0; i < votersCount; i++) 
             {
-                returnList.Add($"Images/userAvatar{UnityEngine.Random.Range(1, 5)}");
+                returnList.Add($"Images/userAvatar{Random.Range(1, 5)}");
             }
             return returnList;
         }
