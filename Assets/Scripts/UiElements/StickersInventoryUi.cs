@@ -8,6 +8,10 @@ using UnityEngine.UI;
 
 namespace UiElements
 {
+    /// <summary>
+    /// Shows user's stickers inventory.
+    /// Creates a draggable image once a sticker is being pressed.
+    /// </summary>
     public class StickersInventoryUi : MonoBehaviour
     {
         const float OUT_OF_SCREEN_Y_ADDON = 1000;

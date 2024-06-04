@@ -12,7 +12,7 @@ namespace UiElements
     public class StickerItemUi : PooledObject, IPointerDownHandler
     {
         [SerializeField] private Image _stickerImage;
-        public Action<int> OnPointerIsDown;
+        public event Action<int> OnPointerIsDown;
         private int _id;
 
         public void Initialize(int id, UserStickerData data)
@@ -28,7 +28,7 @@ namespace UiElements
 
         public override void HandlePreRevertToPool()
         {
-            
+            OnPointerIsDown = null;
         }
 
         public void OnPointerDown(PointerEventData eventData)

@@ -16,7 +16,7 @@ namespace UiElements
         [SerializeField] private TextMeshProUGUI _pollEndedDescriptionText;
         [SerializeField] private Button _exitPollButton;
         [SerializeField] private GenericUiElementAnimator _genericAnimator;
-        public Action OnExitClicked;
+        public event Action OnExitClicked;
         private PollStore PollStore => ClientServices.Instance.PollStore;
 
         private void Awake()

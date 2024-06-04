@@ -27,7 +27,7 @@ namespace UiElements
         [SerializeField] private RectTransform[] _nonSelectedContainers;
         [SerializeField] private RectTransform[] _selectedContainers;
         [SerializeField] private GenericUiElementAnimator _genericAnimator;
-        public Action<int> OnClicked;
+        public event Action<int> OnClicked;
         public RectTransform RootRectTransform => _rootRectTransform;
         public Vector3 ImageRectPosition => _imageRectTransform.position;
         public Vector2 ImageSize => new Vector2(_imageRectTransform.rect.width, _imageRectTransform.rect.height);

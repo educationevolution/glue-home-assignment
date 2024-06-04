@@ -23,10 +23,10 @@ namespace UiElements
         [SerializeField] private RectTransform _participationPhaseContainer;
         [SerializeField] private RectTransform _resultsPhaseContainer;
         [SerializeField] private GenericUiElementAnimator _startPollButtonGenericAnimator;
-        public Action OnStartPollButtonClicked;
-        public Action OnDrawingButtonClicked;
-        public Action OnStickersButtonClicked;
-        public Action OnGalleryButtonClicked;
+        public event Action OnStartPollButtonClicked;
+        public event Action OnDrawingButtonClicked;
+        public event Action OnStickersButtonClicked;
+        public event Action OnGalleryButtonClicked;
         
 
         private void Awake()

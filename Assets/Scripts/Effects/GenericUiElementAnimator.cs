@@ -48,6 +48,7 @@ namespace Effects
 
         public void Bounce(float duration = 0.4f)
         {
+            SetLocalScale(0);
             _bounceStartTime = Time.time;
             _bounceDuration = duration;
         }

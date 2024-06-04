@@ -28,8 +28,8 @@ namespace ServerClientCommunication
         private const float CHAT_MESSAGE_MIN_DELAY = 0.3f;
         private const float CHAT_MESSAGE_MAX_DELAY_ADDON = 1.5f;
         public static FakeServerLink Instance { get; private set; }
-        public Action<ServerChatMessageData> OnChatMessageDataReceived;
-        public Action OnPollResultsDataReceived;
+        public event Action<ServerChatMessageData> OnChatMessageDataReceived;
+        public event Action OnPollResultsDataReceived;
         private Dictionary<int, Coroutine> _fakeRequestsById;
         private int _nextRequestId;
 

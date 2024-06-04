@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace DraggableImages
 {
+    /// <summary>
+    /// Loads images from gallery and instantiating them into draggable images.
+    /// </summary>
     public class GalleryImagesController : MonoBehaviour
     {
         [SerializeField] private DraggableImage _draggableImagePrefab;
@@ -22,6 +25,10 @@ namespace DraggableImages
             _getPollPhaseFunc = getPollPhaseFunc;
         }
 
+        /// <summary>
+        /// Opens a native image selection explorer.
+        /// If the user will choose an image it will be instantiated into a draggable image.
+        /// </summary>
         public void GetImageFromGallery()
         {
             NativeGallery.GetImageFromGallery(GalleryImageCallback);

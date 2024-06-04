@@ -59,7 +59,7 @@ namespace UiElements
         [SerializeField] private Canvas _canvasForGizmos;
 #endif
         public RectTransform RectTransform => _rootRectTransform;
-        public Action OnAddAvatarImageClicked;
+        public event Action OnAddAvatarImageClicked;
         private Coroutine _animationCoroutine;
         private Vector3 _imageOriginPosition;
         private float _maxVotersBarHeightAddon;
@@ -180,6 +180,7 @@ namespace UiElements
             }
             _mainImageContainer.position = _imageOriginPosition;
             _mainImageGenericAnimator.ResetAll();
+            OnAddAvatarImageClicked = null;
         }
 
         private void AddAvatarImageClickedCallback()

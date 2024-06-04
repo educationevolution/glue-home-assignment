@@ -8,6 +8,7 @@ using Infrastructure;
 using UnityEngine.UI;
 using Chat;
 using DraggableImages;
+using Popups;
 
 namespace Screens
 {
@@ -36,14 +37,20 @@ namespace Screens
         [SerializeField] private PollResultsCallToAction _resultsCallToAction;
         [SerializeField] private RectTransform _pollResultsContainer;
         
+        [Header("Popups")]
+        [SerializeField] private AddImageToAvatarInventoryPopup _addImageToAvatarInventoryPopup;
+        [SerializeField] private GenericMessagePopup _genericMessagePopup;
+
+        [Header("Special Features")]
+        [SerializeField] private ChatMessagesDisplayer _chatMessagesDisplayer;
+        [SerializeField] private GalleryImagesController _galleryImagesController;
+        [SerializeField] private StickersInventoryUi _stickersInventory;
+
         [Header("Misc")]
         [SerializeField] private PollTopUi _topUi;
         [SerializeField] private PollBottomBar _bottomBar;
         [SerializeField] private DrawingController _drawingController;
         [SerializeField] private RectTransform _rootContainer;
-        [SerializeField] private ChatMessagesDisplayer _chatMessagesDisplayer;
-        [SerializeField] private GalleryImagesController _galleryImagesController;
-        [SerializeField] private StickersInventoryUi _stickersInventory;
         private Dictionary<int, List<PollOptionPosition>> _optionPositionsByOptionsCount;
         private int? _lastSelectedId;
         private List<PollOptionUi> _pollOptionsUi;
@@ -52,6 +59,7 @@ namespace Screens
         private bool _isDrawingEnabled;
         private EnterPollResponseData PollProperties => ClientServices.Instance.PollStore.CurrentPollProperties;
         private PollResultsResponseData PollResults => ClientServices.Instance.PollStore.CurrentPollResults;
+        private PollPhase GetPollPhase() => _pollPhase;
 
         private void Awake()
         {
@@ -162,8 +170,6 @@ namespace Screens
             _topUi.UpdateUi(_pollPhase);
         }
 
-        private PollPhase GetPollPhase() => _pollPhase;
-
         /// <summary>
         /// Displays a new poll once the data from the server is received.
         /// </summary>
@@ -227,7 +233,7 @@ namespace Screens
                 var positionDeltaFromOptionToResult = optionUi.ImageRectPosition - newOptionResultUi.RectTransform.position;
                 if (isUserChoice)
                 {
-                    newOptionResultUi.OnAddAvatarImageClicked += AddAvatarImageClickedCallback;
+                    newOptionResultUi.OnAddAvatarImageClicked += AddImageToAvatarInventoryClickedCallback;
                 }
                 var uiData = new PollOptionResultData()
                 {
@@ -266,9 +272,19 @@ namespace Screens
             _pollOptionsUi[_lastSelectedId.Value].SetIsSelected(true);
         }
 
-        private void AddAvatarImageClickedCallback()
+        private void AddImageToAvatarInventoryClickedCallback()
         {
             var imageUrl = PollProperties.OptionsData[_lastSelectedId.Value].ImageUrl;
+            _addImageToAvatarInventoryPopup.Activate(imageUrl, HandleAddImageToAvatarInventoryPopupSelection);
+        }
+
+        private void HandleAddImageToAvatarInventoryPopupSelection(bool shouldAddImage)
+        {
+            if (shouldAddImage)
+            {
+                var message = "Image added to your avatar inventory!";
+                _genericMessagePopup.Activate(message);
+            }
         }
 
         private void StartPollButtonClickedCallback()

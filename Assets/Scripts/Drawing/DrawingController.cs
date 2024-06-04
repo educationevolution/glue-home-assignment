@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Infrastructure
 {
+    /// <summary>
+    /// Controlls drawing using line renderers.
+    /// </summary>
     public class DrawingController : MonoBehaviour
     {
         [SerializeField] private Camera _camera;

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Infrastructure
 {
+    /// <summary>
+    /// Controls a single drawing line.
+    /// </summary>
     public class DrawingLine : PooledObject
     {
         [SerializeField] private LineRenderer _lineRenderer;
@@ -18,6 +21,10 @@ namespace Infrastructure
             _isAllowAddingPoints = true;
         }
 
+        /// <summary>
+        /// Try to add a point to line.
+        /// </summary>
+        /// <param name="worldPosition">Point world position</param>
         public void AddPointIfPossible(Vector3 worldPosition)
         {
             if (_isAllowAddingPoints == false)

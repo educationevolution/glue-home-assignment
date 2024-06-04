@@ -6,7 +6,13 @@ namespace Infrastructure
 {
     public abstract class PooledObject : MonoBehaviour
     {
+        /// <summary>
+        /// Perform any actions that are required once an instance is borrowed from the pool.
+        /// </summary>
         public abstract void HandlePostBorrowFromPool();
+        /// <summary>
+        /// Perform any actions that are required once an instance is reverted back to the pool.
+        /// </summary>
         public abstract void HandlePreRevertToPool();
     }
 
