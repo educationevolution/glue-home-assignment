@@ -57,7 +57,7 @@ namespace ServerClientCommunication
             {
                 Id = Random.Range(0, 9999),
                 Question = "WHO IS THE<BR>BEST SINGER?",
-                SecondsLeft = 3,
+                SecondsLeft = 30,
                 OptionsData = optionsData
             };
         }
